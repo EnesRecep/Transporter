@@ -1,5 +1,6 @@
 import java.io.IOException;
 import java.net.*;
+import java.util.Random;
 
 /**
  * Created by Tunc on 27.10.2018.
@@ -19,7 +20,7 @@ public class Server{
         recvPacket = new DatagramPacket(buffer,buffer.length);
         byte[] data = recvPacket.getData();
     }
-    
+
     public DatagramPacket conn(){
 
         try {
@@ -75,5 +76,21 @@ public class Server{
     private int getNewPort(){
         //This method will be used to get new port but for now it will just increment the port
         return port + 1;
+    }
+
+    /*
+    We want our port number between 65535(The maximum port number) and 1024(First 1024 ports are registered ports so we exclude that range).
+    This function will generate a random number between this numbers.
+    random.nextInt(param); generates a random number between 0 and "param"
+    We send 65535 - 1024 = 64511 as param so we will have a random number between 0 and 64511
+    When we add 1024 to this number we will have a number between 1024 and 65535
+     */
+    private int randomPort(){
+        Random random = new Random();
+        int lowerBound = 1024;
+        int higherBound = 65535;
+        int randNum = random.nextInt(higherBound-lowerBound) + lowerBound;
+
+        return randNum;
     }
 }
