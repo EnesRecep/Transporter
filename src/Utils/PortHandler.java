@@ -1,5 +1,7 @@
 package Utils;
 
+import java.net.DatagramSocket;
+import java.net.SocketException;
 import java.util.Random;
 
 /**
@@ -23,9 +25,30 @@ public class PortHandler {
         return randNum;
     }
 
-    public int getPortNumber(){
-        //TODO : Omer fill this
-        return 0;
+    /**
+     * Returns whether specified port is available or not
+     *
+     * @param portNumber the port number (1025 - 65535) that will be checked for availability
+     *
+     * @return true, if the port is available, otherwise false
+     **/
+    public boolean isPortAvailable(int portNumber){
+        if(portNumber < 1025 || portNumber > 65535)
+            throw new IllegalArgumentException("Invalid port number! The port number has to be a number that is between 1025 and 65535");
+
+        DatagramSocket udpSocket;
+
+        try
+        {
+            udpSocket = new DatagramSocket(portNumber);
+            udpSocket.close();
+
+            return true;
+        }
+        catch(SocketException ex)
+        {
+            return false;
+        }
     }
 
     public int getSelectedPort(){
