@@ -30,6 +30,41 @@ public class Server {
         portHandler = new PortHandler();
     }
 
+    public Server(){
+
+    }
+
+    public DatagramSocket getSocket() {
+        return socket;
+    }
+
+    public void setSocket(DatagramSocket socket) {
+        this.socket = socket;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
+    }
+
+    public DatagramPacket getRecvPacket() {
+        return recvPacket;
+    }
+
+    public void setRecvPacket(DatagramPacket recvPacket) {
+        this.recvPacket = recvPacket;
+    }
+
+    public PacketType getPacketType() {
+        return packetType;
+    }
+
+    public void setPacketType(PacketType packetType) {
+        this.packetType = packetType;
+    }
 
     public void openSocket(int port) {
         try {
