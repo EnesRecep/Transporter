@@ -33,14 +33,12 @@ public class PortHandler {
      * @return true, if the port is available, otherwise false
      **/
     public boolean isPortAvailable(int portNumber){
-        if(portNumber < 1025 || portNumber > 65535)
-            throw new IllegalArgumentException("Invalid port number! The port number has to be a number that is between 1025 and 65535");
-
-        DatagramSocket udpSocket;
-
         try
         {
-            udpSocket = new DatagramSocket(portNumber);
+            if(portNumber < 1025 || portNumber > 65535)
+                throw new IllegalArgumentException("Invalid port number! The port number has to be a number that is between 1025 and 65535");
+
+            DatagramSocket udpSocket = new DatagramSocket(portNumber);
             udpSocket.close();
 
             return true;
@@ -49,6 +47,28 @@ public class PortHandler {
         {
             return false;
         }
+        catch(IllegalArgumentException ex)
+        {
+            return false;
+        }
+    }
+
+    /**
+     * Returns an available port
+     * It will be executed until find an available port
+     *
+     * @return an available port number
+     **/
+    public int getPort()
+    {
+        int port = getRandomPortNumber();
+
+        while(!isPortAvailable(port))
+        {
+            port = getRandomPortNumber();
+        }
+
+        return port;
     }
 
     public int getSelectedPort(){

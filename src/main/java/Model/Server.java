@@ -1,6 +1,7 @@
 package Model;
 
 import Utils.PortHandler;
+import enums.PacketTypeFlag;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -102,5 +103,30 @@ public class Server {
         }
     }
 
+    /**
+     * Identifies and returns communication packet type
+     *
+     * @param packet a datagram packet that will be identified
+     *
+     * @return the packet type (00, 01, 10, 11 - see RFC v2.0)
+     **/
+    public PacketTypeFlag getPacketTypeFlag(DatagramPacket packet)
+    {
+        String pflpFlags = String.format("%8s",
+                Integer.toBinaryString(packet.getData()[2] & 0xFF)).replace(' ', '0');
+
+        String packetFlag = pflpFlags.substring(pflpFlags.length() - 2);
+
+        if(packetFlag.equals("00"))
+            return PacketTypeFlag.HANDSHAKING_PACKET;
+        else if(packetFlag.equals("01"))
+            return PacketTypeFlag.HANDSHAKING_ACK;
+        else if(packetFlag.equals("10"))
+            return PacketTypeFlag.MESSAGE_PACKET;
+        else if(packetFlag.equals("11"))
+            return PacketTypeFlag.MESSAGE_ACK;
+        else
+            return PacketTypeFlag.UNKNOWN_PACKET;
+    }
 
 }

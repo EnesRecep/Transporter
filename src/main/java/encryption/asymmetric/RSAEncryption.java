@@ -60,10 +60,7 @@ public class RSAEncryption
   {
     try
     {
-      byte[] publicKeyBytes = Base64.decode(publicKey);
-      X509EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(publicKeyBytes);
-      KeyFactory publicKeyFactory = KeyFactory.getInstance("RSA");
-      RSAPublicKey pubKey = (RSAPublicKey)publicKeyFactory.generatePublic(publicKeySpec);
+      RSAPublicKey pubKey = buildPublicKey(publicKey);
 
       Cipher theCipher = Cipher.getInstance("RSA");
       theCipher.init(Cipher.ENCRYPT_MODE, pubKey);
@@ -91,14 +88,6 @@ public class RSAEncryption
     {
       e.printStackTrace();
     }
-    catch(Base64DecodingException e)
-    {
-      e.printStackTrace();
-    }
-    catch(InvalidKeySpecException e)
-    {
-      e.printStackTrace();
-    }
 
     return null;
   }
@@ -115,10 +104,7 @@ public class RSAEncryption
   {
     try
     {
-      byte[] privateKeyBytes = Base64.decode(privateKey);
-      PKCS8EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(privateKeyBytes);
-      KeyFactory privateKeyFactory = KeyFactory.getInstance("RSA");
-      RSAPrivateKey priKey = (RSAPrivateKey)privateKeyFactory.generatePrivate(privateKeySpec);
+      RSAPrivateKey priKey = buildPrivateKey(privateKey);
 
       Cipher theCipher = Cipher.getInstance("RSA");
       theCipher.init(Cipher.DECRYPT_MODE, priKey);
@@ -151,9 +137,71 @@ public class RSAEncryption
     {
       e.printStackTrace();
     }
-    catch(InvalidKeySpecException e)
+
+    return null;
+  }
+
+  /**
+   * Builds existing public key that is in string format
+   *
+   * @param publicKey existing public key that is in string format
+   *
+   * @return public key object
+   **/
+  public RSAPublicKey buildPublicKey(String publicKey)
+  {
+    try
     {
-      e.printStackTrace();
+      byte[] publicKeyBytes = Base64.decode(publicKey);
+      X509EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(publicKeyBytes);
+      KeyFactory publicKeyFactory = KeyFactory.getInstance("RSA");
+
+      return (RSAPublicKey)publicKeyFactory.generatePublic(publicKeySpec);
+    }
+    catch(Base64DecodingException ex)
+    {
+      ex.printStackTrace();
+    }
+    catch(NoSuchAlgorithmException ex)
+    {
+      ex.printStackTrace();
+    }
+    catch(InvalidKeySpecException ex)
+    {
+      ex.printStackTrace();
+    }
+
+    return null;
+  }
+
+  /**
+   * Builds existing private key that is in string format
+   *
+   * @param privateKey existing private key that is in string format
+   *
+   * @return private key object
+   **/
+  public RSAPrivateKey buildPrivateKey(String privateKey)
+  {
+    try
+    {
+      byte[] privateKeyBytes = Base64.decode(privateKey);
+      PKCS8EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(privateKeyBytes);
+      KeyFactory privateKeyFactory = KeyFactory.getInstance("RSA");
+
+      return (RSAPrivateKey)privateKeyFactory.generatePrivate(privateKeySpec);
+    }
+    catch(Base64DecodingException ex)
+    {
+      ex.printStackTrace();
+    }
+    catch(NoSuchAlgorithmException ex)
+    {
+      ex.printStackTrace();
+    }
+    catch(InvalidKeySpecException ex)
+    {
+      ex.printStackTrace();
     }
 
     return null;
