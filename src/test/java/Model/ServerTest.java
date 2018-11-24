@@ -1,6 +1,9 @@
 package Model;
 
 import org.junit.Test;
+
+import java.net.DatagramPacket;
+
 import static org.junit.Assert.*;
 /**
  * Created by Enes Recep on 23.11.2018.
@@ -13,6 +16,20 @@ public class ServerTest {
         Server server = new Server();
         server.openSocket(7777);
         assertNotNull(server.getSocket());
+    }
+
+    /**
+     * Test 'getPacketTypeFlag' function ability
+     **/
+    @Test
+    public void getPacketTypeTest()
+    {
+        Server server = new Server();
+        String data = "00000000000100110000011000000101110111000000011111010000000010011100010000001011101110000000110110101100000011111010000011111111111111111111111111111111";
+        DatagramPacket datagramPacket = new DatagramPacket(data.getBytes(), data.length());
+
+        // 10 is in binary format and it represents communication message packet type (see RFC v2.0)
+        assertEquals("10", server.getPacketTypeFlag(datagramPacket).toString());
     }
 
 }
