@@ -16,9 +16,10 @@ import java.security.spec.X509EncodedKeySpec;
  * 1. Generate new public - private key pair
  * 2. Encrypt a secret key with public key
  * 3. Decrypt an encrypted secret key with private key
+ * 4. Build public or private key from existing keys
  *
  * @author 19XLR95
- * @version 1.1
+ * @version 2.1
  * @since 07.11.2018
  **/
 public class RSAEncryption
