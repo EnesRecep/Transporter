@@ -113,7 +113,7 @@ public class Server {
     public PacketTypeFlag getPacketTypeFlag(DatagramPacket packet)
     {
         String pflpFlags = String.format("%8s",
-                Integer.toBinaryString(packet.getData()[2] & 0xFF)).replace(' ', '0');
+                Integer.toBinaryString(packet.getData()[1] & 0xFF)).replace(' ', '0');
 
         String packetFlag = pflpFlags.substring(pflpFlags.length() - 2);
 
