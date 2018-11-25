@@ -75,6 +75,12 @@ public class Server {
         }
     }
 
+    public void closeSocket()
+    {
+        if(socket != null)
+            socket.close();
+    }
+
     public DatagramPacket waitForPacket() {
 
         port = portHandler.getSelectedPort();
@@ -92,7 +98,7 @@ public class Server {
         return recvPacket;
     }
 
-    public void sendACKPacket(Object data, String addr, int port) {
+    public DatagramPacket sendACKPacket(Object data, String addr, int port) {
 
         DatagramPacket packet = packetType.createPacket(data, addr, port);
 
@@ -101,6 +107,8 @@ public class Server {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        return packet;
     }
 
     /**

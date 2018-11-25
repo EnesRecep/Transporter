@@ -35,4 +35,26 @@ public enum PacketTypeFlag
   public String toString()
   {
     return this.packetTypeFlag;
-  }}
+  }
+
+  /**
+   * Convert a string to appropriate enumeration value
+   *
+   * @param packetTypeFlag the string that will be converted to enumeration value
+   *
+   * @return appropriate enumeration value
+   **/
+  public static PacketTypeFlag toPacketTypeFlagEnum(String packetTypeFlag)
+  {
+    if(packetTypeFlag.equals("00"))
+      return HANDSHAKING_PACKET;
+    else if(packetTypeFlag.equals("01"))
+      return HANDSHAKING_ACK;
+    else if(packetTypeFlag.equals("10"))
+      return MESSAGE_PACKET;
+    else if(packetTypeFlag.equals("11"))
+      return MESSAGE_ACK;
+    else
+      return UNKNOWN_PACKET;
+  }
+}

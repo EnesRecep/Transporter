@@ -34,14 +34,28 @@ public class Client {
         }
     }
 
+    public void closeSocket()
+    {
+        if(socket != null)
+            socket.close();
+    }
 
-    public void sendPacket(byte[] byteData, String addr, int port){
+    public DatagramSocket getSocket()
+    {
+        return socket;
+    }
+
+
+    public DatagramPacket sendPacket(byte[] byteData, String addr, int port){
         try {
             DatagramPacket packet = packetType.createPacket(byteData, addr, port);
             socket.send(packet);
+            return packet;
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        return null;
     }
 
     public int getPort(){
