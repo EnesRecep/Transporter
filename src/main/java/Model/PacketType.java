@@ -8,31 +8,24 @@ import java.net.DatagramPacket;
 
 
 public interface PacketType {
-
     public DatagramPacket createPacket(Object data, String addr, int port);
-
 }
 
 class HandshakePacket implements PacketType{
-
-    public DatagramPacket createPacket(Object data, String addr, int port) {
-        return null;
-    }
+    public DatagramPacket createPacket(Object data, String addr, int port) { return null; }
 }
 
-class ACKPacket implements PacketType{
-
-    public DatagramPacket createPacket(Object data, String addr, int port) {
-
-        return null;
-    }
+class HandshakeACKPacket implements PacketType{
+    public DatagramPacket createPacket(Object data, String addr, int port) { return null; }
 }
 
 class MessagePacket implements PacketType{
+    public DatagramPacket createPacket(Object data, String addr, int port) { return null; }
+}
 
-    public DatagramPacket createPacket(Object data, String addr, int port) {
-        return null;
-    }
+class MesageACKPacket implements PacketType
+{
+    public DatagramPacket createPacket(Object data, String addr, int port) { return null; }
 }
 
 
