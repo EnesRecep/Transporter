@@ -13,29 +13,6 @@ public interface PacketType {
 
 }
 
-class HandshakePacket implements PacketType{
-
-    public DatagramPacket createPacket(Object data, String addr, int port) {
-        return null;
-    }
-}
-
-class ACKPacket implements PacketType{
-
-    public DatagramPacket createPacket(Object data, String addr, int port) {
-
-        return null;
-    }
-}
-
-class MessagePacket implements PacketType{
-
-    public DatagramPacket createPacket(Object data, String addr, int port) {
-        return null;
-    }
-}
-
-
 
 
 
