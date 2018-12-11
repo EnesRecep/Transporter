@@ -24,7 +24,6 @@ public class ServerListener implements Runnable {
     public ServerListener(int port, ServerListenerPool pool){
         this.port = port;
         this.pool = pool;
-        run();
     }
 
     public DatagramPacket returnPacket(){

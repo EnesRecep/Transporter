@@ -24,8 +24,13 @@ public class ServerListenerPool {
 
     public DatagramPacket threadPoolRunner(int[] ports){
 
+
         for(int i = 0 ; i < ports.length ; i++) {
-            listeners.add(new ServerListener(ports[i], s));
+            ServerListener listener = new ServerListener(ports[i],s);
+            Thread thread = new Thread(listener);
+            listeners.add(listener);
+            thread.start();
+
         }
 
         while(true){
