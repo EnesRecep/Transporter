@@ -7,7 +7,7 @@ import java.net.DatagramPacket;
 /**
  * Created by Enes Recep on 22.11.2018.
  */
-public class Packet {
+public class Packet implements Comparable<Packet>{
 
     private int order;
     private int partition;
@@ -16,11 +16,15 @@ public class Packet {
     private PacketTypeFlag packetTypeFlag;
     private int[] ackPorts;
     private int[] messagePorts;
-    private Object data;
+    private byte[] data; //was Object changed to byte[]
     public Packet()
     {
     }
-    public Packet(int order, int partition, int fin, int last, PacketTypeFlag packetTypeFlag, int[] ackPorts, int[] messagePorts, Object data)
+
+    public Packet(DatagramPacket datagramPacket){
+        parsePacket(datagramPacket);
+    }
+    public Packet(int order, int partition, int fin, int last, PacketTypeFlag packetTypeFlag, int[] ackPorts, int[] messagePorts, byte[] data)
     {
         this.order = order;
         this.partition = partition;
@@ -87,11 +91,11 @@ public class Packet {
     {
         this.messagePorts = messagePorts;
     }
-    public Object getData()
+    public byte[] getData()
     {
         return data;
     }
-    public void setData(Object data)
+    public void setData(byte[] data)
     {
         this.data = data;
     }
@@ -105,7 +109,7 @@ public class Packet {
         messagePorts[0] = Integer.parseInt(packetData.substring(73, 89), 2);
         messagePorts[1] = Integer.parseInt(packetData.substring(89, 105), 2);
         messagePorts[2] = Integer.parseInt(packetData.substring(105, 121), 2);
-        data = packetData.substring(121);
+        data = packetData.substring(121).getBytes();
         packetTypeFlag = PacketTypeFlag.toPacketTypeFlagEnum(packetData.substring(23, 24));
         if(packetTypeFlag == PacketTypeFlag.HANDSHAKING_ACK || packetTypeFlag == PacketTypeFlag.MESSAGE_ACK)
         {
@@ -122,4 +126,19 @@ public class Packet {
     }
 
 
+    /*
+    This method is used to compare packets according to their orders
+    if this packet's order is greater returns 1
+    if less returns -1
+     */
+    @Override
+    public int compareTo(Packet packet) {
+        if(this.getOrder() > packet.getOrder()){
+            return 1;
+        }else if(this.getOrder() < packet.getOrder()){
+            return -1;
+        }
+
+        return 0;
+    }
 }
