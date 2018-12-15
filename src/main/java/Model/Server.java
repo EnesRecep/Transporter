@@ -75,9 +75,7 @@ public class Server {
         }
     }
 
-    public DatagramPacket waitForPacket() {
-
-        port = portHandler.getSelectedPort();
+    public DatagramPacket waitForPacket(int port) {
 
         try {
             socket = new DatagramSocket(port);
