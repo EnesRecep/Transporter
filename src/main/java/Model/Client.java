@@ -35,13 +35,15 @@ public class Client {
     }
 
 
-    public void sendPacket(byte[] byteData, String addr, int port){
+    public DatagramPacket sendPacket(byte[] byteData, String addr, int port){
+        DatagramPacket packet = null;
         try {
-            DatagramPacket packet = packetType.createPacket(byteData, addr, port);
+            packet = packetType.createPacket(byteData, addr, port);
             socket.send(packet);
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return packet;
     }
 
     public int getPort(){

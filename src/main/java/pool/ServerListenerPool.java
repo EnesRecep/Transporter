@@ -22,6 +22,7 @@ public class ServerListenerPool {
 
     }
 
+
     public DatagramPacket threadPoolRunner(int[] ports){
 
 
@@ -63,7 +64,7 @@ public class ServerListenerPool {
 
     public void terminate(){
         for(ServerListener s : listeners){
-            s.execution = false;
+            s.setExecution(false);
         }
     }
 

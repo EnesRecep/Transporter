@@ -1,7 +1,9 @@
 package Utils;
 
 import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.Random;
 
 /**
@@ -77,9 +79,35 @@ public class PortHandler {
         return 0;
     }
 
-    public int createPortNumberFromDestinationHostname(){
+    public int[] createPortNumberFromDestinationHostname(String ip){
 
-        return 0;
+        ip = ip.replaceAll(".","");
+
+        int initial = (int) (Long.valueOf(ip) % 21846);
+        if(initial < 1024)
+            initial += 1024;
+
+        int[] ports = {initial,initial+21846,initial+(21846*2)};
+
+        return ports;
+    }
+
+    public String getMyIP(){
+        String ip ="";
+        try(final DatagramSocket socket = new DatagramSocket()){
+            socket.connect(InetAddress.getByName("8.8.8.8"), 10002);
+            ip = socket.getLocalAddress().getHostAddress();
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        } catch (SocketException e) {
+            e.printStackTrace();
+        }
+
+        return ip;
+    }
+
+    public int[] getMyPorts(){
+        return createPortNumberFromDestinationHostname(getMyIP());
     }
 
 }
