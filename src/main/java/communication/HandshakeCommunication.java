@@ -3,6 +3,8 @@ package communication;
 import Model.*;
 import Utils.PortHandler;
 import pool.ServerListenerPool;
+
+import javax.sound.sampled.Port;
 import java.net.DatagramPacket;
 
 /**
@@ -24,6 +26,17 @@ public class HandshakeCommunication {
         
     }
 
+    public void sendHandshakeACK(DatagramPacket receivedHandshakePacket){
+
+        packetParser.parsePacket(receivedHandshakePacket);
+
+        for(int i = 0 ; i < Constants.MAX_TEST_TIME ; i++){
+            client.sendPacket(null, receivedHandshakePacket.getAddress().toString(), packetParser.getAckPorts()[i%3]);
+        }
+
+        //Call Omer's Listen method
+    }
+
     public void sendHandshake(String addr){
 
         if(!state)
@@ -34,7 +47,7 @@ public class HandshakeCommunication {
 
                 client.openSocket();
 
-                DatagramPacket sendingPacket = client.sendPacket(null, addr, portHandler.calculatePorts());
+                DatagramPacket sendingPacket = client.sendPacket(null, addr, portHandler.createPortNumberFromDestinationHostname(addr)[i%3]);
 
                 packetParser.parsePacket(sendingPacket);
 
