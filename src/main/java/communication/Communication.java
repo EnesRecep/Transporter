@@ -11,7 +11,6 @@ public class Communication implements Runnable{
 
     private String oppositeAddr;
     private DatagramPacket handshakePacket;
-    private DatagramPacket handshakeACKpacket;
     private boolean isCommunicationStartedByUs;
     HandshakeCommunication handshakeCommunication = new HandshakeCommunication();
     PortHandler handler = new PortHandler();
@@ -28,6 +27,10 @@ public class Communication implements Runnable{
     public void setOppositeAddr(String oppositeAddr) {
 
         this.oppositeAddr = oppositeAddr;
+    }
+
+    public DatagramPacket getHandshakePacket() {
+        return handshakePacket;
     }
 
     public boolean isCommunicationStartedByUs() {
