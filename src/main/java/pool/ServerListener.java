@@ -9,12 +9,12 @@ import java.net.DatagramPacket;
  */
 public class ServerListener implements Runnable {
 
-    Server server = new Server();
-    ServerListenerPool pool;
-    int port;
-    DatagramPacket packet;
-    boolean execution;
-    boolean found;
+    private Server server = new Server();
+    private ServerListenerPool pool;
+    private int port;
+    private DatagramPacket packet;
+    private boolean execution;
+    private boolean found;
 
 
     public void setExecution(boolean execution) {
@@ -32,7 +32,7 @@ public class ServerListener implements Runnable {
 
     @Override
     public void run() {
-        DatagramPacket tempPacket = new DatagramPacket(null,1);
+        DatagramPacket tempPacket;
         do {
 
             tempPacket = server.waitForPacket(port);

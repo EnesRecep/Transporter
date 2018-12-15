@@ -18,7 +18,7 @@ public class ServerListenerPool {
     int maxAttempt = Constants.ACK_TIMEOUT * 100; //Timeout in millis / 10 milliseconds
 
     public ServerListenerPool(){
-        threadPoolRunner(ports);
+        //threadPoolRunner(ports);
 
     }
 
