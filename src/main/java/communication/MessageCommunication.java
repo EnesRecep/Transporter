@@ -1,9 +1,8 @@
 package communication;
 
-import Model.Client;
 import Model.Packet;
-import Model.Server;
 import Utils.PacketHandler;
+import Utils.SocketHandler;
 import exceptions.*;
 
 import java.net.DatagramPacket;
@@ -30,6 +29,7 @@ public class MessageCommunication
 
   // The data that is used to save sent user message
   private Object outgoingData;
+  private DatagramPacket[]
 
   // The data that is used to save sent user message
   private Object incomigData;
@@ -51,6 +51,9 @@ public class MessageCommunication
 
   // The packet parser
   private PacketHandler packetHandler;
+
+  //SocketHandler
+  private SocketHandler socketHandler;
 
   /*
    * The switch that is used to change communication operation (send message or listen message)
@@ -215,25 +218,6 @@ public class MessageCommunication
     this.incomigData = incomigData;
   }
 
-  public Server getServer()
-  {
-    return server;
-  }
-
-  public void setServer(Server server)
-  {
-    this.server = server;
-  }
-
-  public Client getClient()
-  {
-    return client;
-  }
-
-  public void setClient(Client client)
-  {
-    this.client = client;
-  }
 
   public void setCommunicationStartState(boolean state)
   {
@@ -255,6 +239,19 @@ public class MessageCommunication
     this.address = address;
   }
 
+
+  public void startMessageCommunicaiton() throws CommunicationDataException, PacketSendException {
+
+    if(outgoingData == null)
+      throw new CommunicationDataException("The communication data is null!");
+
+    if(!state)
+      throw new PacketSendException("The communication is close!");
+
+
+
+  }
+
   /**
    * Creates and sends a communication message packet
    * After sending packet, it listens the packet's ack
@@ -272,8 +269,9 @@ public class MessageCommunication
     {
       try
       {
-        client.openSocket();
+        socketHandler.openSocket();
 
+        
         DatagramPacket outgoingMessagePacket = client.sendPacket(outgoingData, address, messagePortsSend[i % 3]);
 
         packet = packetHandler.parsePacket(outgoingMessagePacket);
