@@ -47,4 +47,8 @@ public class CommunicationPool {
     public void addCommunication(Communication communication){
         communications.add(communication);
     }
+
+    public void removeCommunication(Communication communication){
+        communications.remove(communication);
+    }
 }
