@@ -13,13 +13,13 @@ public enum PacketTypeFlag
   HANDSHAKING_PACKET ("00"),
 
   // Communication handshaking ack packet type
-  HANDSHAKING_ACK ("01"),
+  ACK_PACKET ("01"),
 
   // Communication message packet type
   MESSAGE_PACKET ("10"),
 
   // Communication message ack packet type
-  MESSAGE_ACK ("11"),
+  FIN_PACKET ("11"),
 
   // Unknown communication packet type
   UNKNOWN_PACKET ("Unknown packet type!");
@@ -35,4 +35,26 @@ public enum PacketTypeFlag
   public String toString()
   {
     return this.packetTypeFlag;
-  }}
+  }
+
+  /**
+   * Convert a string to appropriate enumeration value
+   *
+   * @param packetTypeFlag the string that will be converted to enumeration value
+   *
+   * @return appropriate enumeration value
+   **/
+  public static PacketTypeFlag toPacketTypeFlagEnum(String packetTypeFlag)
+  {
+    if(packetTypeFlag.equals("00"))
+      return HANDSHAKING_PACKET;
+    else if(packetTypeFlag.equals("01"))
+      return ACK_PACKET;
+    else if(packetTypeFlag.equals("10"))
+      return MESSAGE_PACKET;
+    else if(packetTypeFlag.equals("11"))
+      return FIN_PACKET;
+    else
+      return UNKNOWN_PACKET;
+  }
+}

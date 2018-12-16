@@ -1,5 +1,7 @@
 package Model;
 
+import enums.PacketTypeFlag;
+
 import java.net.DatagramPacket;
 
 /**
@@ -8,7 +10,7 @@ import java.net.DatagramPacket;
 public class ACKPacket implements PacketType {
 
     @Override
-    public DatagramPacket createPacket(Object data, String addr, int port) {
-        return null;
+    public DatagramPacket[] createPacket(Object data, String addr, int port) {
+        return new PacketCreator().createPacket(data, addr, port, PacketTypeFlag.ACK_PACKET);
     }
 }

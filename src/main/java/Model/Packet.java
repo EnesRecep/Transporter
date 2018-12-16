@@ -1,5 +1,6 @@
 package Model;
 
+import Utils.PacketHandler;
 import enums.PacketTypeFlag;
 
 import java.net.DatagramPacket;
@@ -22,7 +23,16 @@ public class Packet implements Comparable<Packet>{
     }
 
     public Packet(DatagramPacket datagramPacket){
-        parsePacket(datagramPacket);
+//        parsePacket(datagramPacket);
+        Packet tempPacket = new PacketHandler().parsePacket(datagramPacket);
+        this.order = tempPacket.order;
+        this.partition = tempPacket.partition;
+        this.fin = tempPacket.fin;
+        this.last = tempPacket.last;
+        this.packetTypeFlag = tempPacket.packetTypeFlag;
+        this.ackPorts = tempPacket.ackPorts;
+        this.messagePorts = tempPacket.messagePorts;
+        this.data = tempPacket.data;
     }
     public Packet(int order, int partition, int fin, int last, PacketTypeFlag packetTypeFlag, int[] ackPorts, int[] messagePorts, byte[] data)
     {
@@ -99,31 +109,32 @@ public class Packet implements Comparable<Packet>{
     {
         this.data = data;
     }
-    public void parsePacket(DatagramPacket packet)
-    {
-        String packetData = new String(packet.getData());
-        order = Integer.parseInt(packetData.substring(0, 17), 2);
-        partition = Integer.parseInt(packetData.substring(17, 21), 2);
-        fin = Integer.parseInt(packetData.substring(21, 22), 2);
-        last = Integer.parseInt(packetData.substring(22, 23), 2);
-        messagePorts[0] = Integer.parseInt(packetData.substring(73, 89), 2);
-        messagePorts[1] = Integer.parseInt(packetData.substring(89, 105), 2);
-        messagePorts[2] = Integer.parseInt(packetData.substring(105, 121), 2);
-        data = packetData.substring(121).getBytes();
-        packetTypeFlag = PacketTypeFlag.toPacketTypeFlagEnum(packetData.substring(23, 24));
-        if(packetTypeFlag == PacketTypeFlag.HANDSHAKING_ACK || packetTypeFlag == PacketTypeFlag.MESSAGE_ACK)
-        {
-            ackPorts[0] = -1;
-            ackPorts[1] = -1;
-            ackPorts[2] = -1;
-        }
-        else
-        {
-            ackPorts[0] = Integer.parseInt(packetData.substring(25, 41), 2);
-            ackPorts[1] = Integer.parseInt(packetData.substring(41, 57), 2);
-            ackPorts[2] = Integer.parseInt(packetData.substring(57, 73), 2);
-        }
-    }
+//    public void parsePacket(DatagramPacket packet)
+//    {
+//
+//        String packetData = new String(packet.getData());
+//        order = Integer.parseInt(packetData.substring(0, 17), 2);
+//        partition = Integer.parseInt(packetData.substring(17, 21), 2);
+//        fin = Integer.parseInt(packetData.substring(21, 22), 2);
+//        last = Integer.parseInt(packetData.substring(22, 23), 2);
+//        messagePorts[0] = Integer.parseInt(packetData.substring(73, 89), 2);
+//        messagePorts[1] = Integer.parseInt(packetData.substring(89, 105), 2);
+//        messagePorts[2] = Integer.parseInt(packetData.substring(105, 121), 2);
+//        data = packetData.substring(121).getBytes();
+//        packetTypeFlag = PacketTypeFlag.toPacketTypeFlagEnum(packetData.substring(23, 24));
+//        if(packetTypeFlag == PacketTypeFlag.ACK_PACKET)
+//        {
+//            ackPorts[0] = -1;
+//            ackPorts[1] = -1;
+//            ackPorts[2] = -1;
+//        }
+//        else
+//        {
+//            ackPorts[0] = Integer.parseInt(packetData.substring(25, 41), 2);
+//            ackPorts[1] = Integer.parseInt(packetData.substring(41, 57), 2);
+//            ackPorts[2] = Integer.parseInt(packetData.substring(57, 73), 2);
+//        }
+//    }
 
 
     /*

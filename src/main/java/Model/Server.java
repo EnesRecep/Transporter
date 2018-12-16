@@ -1,5 +1,6 @@
 package Model;
 
+import Utils.PacketHandler;
 import Utils.PortHandler;
 import enums.PacketTypeFlag;
 
@@ -110,21 +111,7 @@ public class Server {
      **/
     public PacketTypeFlag getPacketTypeFlag(DatagramPacket packet)
     {
-        String pflpFlags = String.format("%8s",
-                Integer.toBinaryString(packet.getData()[1] & 0xFF)).replace(' ', '0');
-
-        String packetFlag = pflpFlags.substring(pflpFlags.length() - 2);
-
-        if(packetFlag.equals("00"))
-            return PacketTypeFlag.HANDSHAKING_PACKET;
-        else if(packetFlag.equals("01"))
-            return PacketTypeFlag.HANDSHAKING_ACK;
-        else if(packetFlag.equals("10"))
-            return PacketTypeFlag.MESSAGE_PACKET;
-        else if(packetFlag.equals("11"))
-            return PacketTypeFlag.MESSAGE_ACK;
-        else
-            return PacketTypeFlag.UNKNOWN_PACKET;
+        return new PacketHandler().parsePacket(packet).getPacketTypeFlag();
     }
 
 }
