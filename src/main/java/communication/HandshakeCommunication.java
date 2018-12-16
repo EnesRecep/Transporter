@@ -21,7 +21,7 @@ public class HandshakeCommunication {
     private boolean state;
     private PortHandler portHandler;
     private PacketHandler packetHandler;
-    private Packet packetParser;
+    private PacketHandler packetParser;
     private int[] ackPortsListen;
     private int[] messagePortsListen;
     private int[] messagePortsSend;
@@ -64,9 +64,9 @@ public class HandshakeCommunication {
                 if(receivingPacket == null)
                     continue;
 
-                packetParser.parsePacket(receivingPacket);
+                Packet receivedPacket = packetParser.parsePacket(receivingPacket);
 
-                messagePortsSend = packetParser.getMessagePorts();
+                messagePortsSend = receivedPacket.getMessagePorts();
 
                 //CALL OMER's method with messagePortSend
                 break;

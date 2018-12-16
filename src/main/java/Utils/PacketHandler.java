@@ -43,7 +43,7 @@ public class PacketHandler {
         Object object = dataExtraction(datagramPacket);
 
         if(object != null){
-            notify(object);
+            //notify(object);
         }
     }
 
@@ -216,7 +216,7 @@ public class PacketHandler {
         parsedPacket.setLast(Integer.parseInt(packetContent.substring(21, 22), 2));
         parsedPacket.setPacketTypeFlag(PacketTypeFlag.toPacketTypeFlagEnum(packetContent.substring(22, 24)));
 
-        if(parsedPacket.getPacketTypeFlag() == PacketTypeFlag.HANDSHAKING_ACK || parsedPacket.getPacketTypeFlag() == PacketTypeFlag.MESSAGE_ACK)
+        if(parsedPacket.getPacketTypeFlag() == PacketTypeFlag.ACK_PACKET)
         {
             int[] messagePorts = {
                     Integer.parseInt(packetContent.substring(24, 40), 2),
