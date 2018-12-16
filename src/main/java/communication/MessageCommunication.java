@@ -1,10 +1,15 @@
 package communication;
 
+import Model.MessagePacket;
 import Model.Packet;
+import Model.PacketType;
 import Utils.PacketHandler;
 import Utils.SocketHandler;
+import enums.PacketTypeFlag;
 import exceptions.*;
+import pool.ServerListenerPool;
 
+import javax.xml.crypto.Data;
 import java.net.DatagramPacket;
 import java.net.SocketTimeoutException;
 
@@ -29,16 +34,11 @@ public class MessageCommunication
 
   // The data that is used to save sent user message
   private Object outgoingData;
-  private DatagramPacket[]
+
+  private PacketType packetType;
 
   // The data that is used to save sent user message
   private Object incomigData;
-
-  // The server that is used to listen message and send related ack
-  private Server server;
-
-  // The client that is used to send user message
-  private Client client;
 
   // The state indicates whether communication open and start or not.
   private boolean state;
@@ -94,7 +94,7 @@ public class MessageCommunication
   {
     this.messagePortsSend = messagePortsSend;
     this.address = address;
-    this.server = server;
+
     state = false;
     incomigData = null;
     outgoingData = null;
@@ -114,7 +114,6 @@ public class MessageCommunication
   {
     this.messagePortsSend = messagePortsSend;
     this.address = address;
-    this.client = client;
     state = false;
     incomigData = null;
     outgoingData = null;
@@ -240,7 +239,7 @@ public class MessageCommunication
   }
 
 
-  public void startMessageCommunicaiton() throws CommunicationDataException, PacketSendException {
+  public void startMessageCommunication(boolean isCommunicationStartedByUs) throws CommunicationDataException, PacketSendException {
 
     if(outgoingData == null)
       throw new CommunicationDataException("The communication data is null!");
@@ -248,7 +247,43 @@ public class MessageCommunication
     if(!state)
       throw new PacketSendException("The communication is close!");
 
+    if(isCommunicationStartedByUs){
 
+        packetType = new MessagePacket();
+        DatagramPacket[] packets = packetType.createPacket(outgoingData, address, 5555);
+
+
+        for(int i = 0 ; i < packets.length ; i++){
+            for (int j = 0 ; j < Constants.MAX_TEST_TIME ; j++){
+                packets[i].setPort(messagePortsSend[j % 3]);
+                socketHandler.sendPacket(packets[i]);
+
+
+                ServerListenerPool ackPool = new ServerListenerPool();
+                DatagramPacket receivedACK = ackPool.threadPoolRunner(ackPortsListen);
+
+                if(receivedACK == null){
+                    continue;
+                }
+                if(  /* hash of packet.data == received.ack.data*/ ) {
+                    if(packetHandler.getPacketTypeFlag(packets[i]).equals(PacketTypeFlag.FIN_PACKET)){
+                        Communication communication = new Communication().FINProcedure();
+                    }
+                    break;
+                }
+            }
+        }
+    }
+    else{
+        while(true) {
+            ServerListenerPool ackPool = new ServerListenerPool();
+            DatagramPacket receivedACK = ackPool.threadPoolRunner(messagePortsListen);
+            if(receivedACK != null)
+                break;
+        }
+
+        //SEND ACK
+    }
 
   }
 
@@ -271,7 +306,7 @@ public class MessageCommunication
       {
         socketHandler.openSocket();
 
-        
+
         DatagramPacket outgoingMessagePacket = client.sendPacket(outgoingData, address, messagePortsSend[i % 3]);
 
         packet = packetHandler.parsePacket(outgoingMessagePacket);
