@@ -9,7 +9,7 @@ import java.net.DatagramPacket;
 
 public interface PacketType {
 
-    public DatagramPacket createPacket(Object data, String addr, int port);
+    public DatagramPacket[] createPacket(Object data, String addr, int port);
 
 }
 

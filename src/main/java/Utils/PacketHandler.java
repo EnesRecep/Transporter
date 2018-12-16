@@ -1,6 +1,9 @@
 package Utils;
 
 import Model.Packet;
+import enums.BitTypeFlag;
+import enums.MaxPacketSize;
+import enums.PacketTypeFlag;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -101,6 +104,152 @@ public class PacketHandler {
         }
 
         return dataObject;
+    }
+
+    /**
+     * Divides user data into specified chunk sizes
+     *
+     * @param data the user data that will be divided into chunks
+     * @param size the max user data size in a packet
+     *
+     * @return user data chunks
+     **/
+    public ArrayList<byte[]> dividePacket(byte[] data, MaxPacketSize size)
+    {
+        ArrayList<byte[]> dataArray = new ArrayList<>();
+
+        int totalChunks = data.length / size.getSize();
+
+        for(int i = 0; i < totalChunks; i++)
+        {
+            byte[] dataChunk = new byte[size.getSize()];
+
+            System.arraycopy(data, i * size.getSize(), dataChunk, 0, size.getSize());
+
+            dataArray.add(dataChunk);
+        }
+
+        int remainData = data.length % size.getSize();
+
+        if(remainData > 0)
+        {
+            byte[] remainBytes = new byte[remainData];
+
+            System.arraycopy(data, totalChunks * size.getSize(), remainBytes, 0, remainData);
+
+            dataArray.add(remainBytes);
+        }
+
+        return dataArray;
+    }
+
+    /**
+     * Converts numbers or flags to bit type
+     *
+     * @param i the number or flag that will be converted
+     * @param f the bit length (to 1, 2, 4, 16 bits)
+     *
+     * @return converted number or flag
+     **/
+    public String toBinary(int i, BitTypeFlag f)
+    {
+        String binary = "";
+
+        if(f == BitTypeFlag.TO_16_BIT)
+        {
+            binary = Integer.toBinaryString(i);
+
+            if(binary.length() < 16)
+            {
+                int k = 16 - binary.length();
+
+                for(int j = 0; j < k; j++)
+                {
+                    binary = "0" + binary;
+                }
+            }
+        }
+        else if(f == BitTypeFlag.TO_4_BIT)
+        {
+            binary = Integer.toBinaryString(i);
+
+            if(binary.length() < 4)
+            {
+                int k = 4 - binary.length();
+
+                for(int j = 0; j < k; j++)
+                {
+                    binary = "0" + binary;
+                }
+            }
+        }
+        else if(f == BitTypeFlag.TO_2_BIT)
+        {
+            binary = Integer.toBinaryString(i);
+
+            if(binary.length() < 2)
+            {
+                int k = 2 - binary.length();
+
+                for(int j = 0; j < k; j++)
+                {
+                    binary = "0" + binary;
+                }
+            }
+        }
+        else if(f == BitTypeFlag.TO_1_BIT)
+        {
+            binary = Integer.toBinaryString(i);
+        }
+
+        return binary;
+    }
+
+    public Packet parsePacket(DatagramPacket packet)
+    {
+        String packetContent = new String(packet.getData());
+        Packet parsedPacket = new Packet();
+
+        parsedPacket.setOrder(Integer.parseInt(packetContent.substring(0, 16), 2));
+        parsedPacket.setPartition(Integer.parseInt(packetContent.substring(16, 20), 2));
+        parsedPacket.setFin(Integer.parseInt(packetContent.substring(20, 21), 2));
+        parsedPacket.setLast(Integer.parseInt(packetContent.substring(21, 22), 2));
+        parsedPacket.setPacketTypeFlag(PacketTypeFlag.toPacketTypeFlagEnum(packetContent.substring(22, 24)));
+
+        if(parsedPacket.getPacketTypeFlag() == PacketTypeFlag.HANDSHAKING_ACK || parsedPacket.getPacketTypeFlag() == PacketTypeFlag.MESSAGE_ACK)
+        {
+            int[] messagePorts = {
+                    Integer.parseInt(packetContent.substring(24, 40), 2),
+                    Integer.parseInt(packetContent.substring(40, 56), 2),
+                    Integer.parseInt(packetContent.substring(56, 72), 2)
+            };
+
+            int[] ackPorts = {-1, -1, -1};
+
+            parsedPacket.setMessagePorts(messagePorts);
+            parsedPacket.setAckPorts(ackPorts);
+            parsedPacket.setData(packetContent.substring(72).getBytes());
+        }
+        else
+        {
+            int[] ackPorts = {
+                    Integer.parseInt(packetContent.substring(24, 40), 2),
+                    Integer.parseInt(packetContent.substring(40, 56), 2),
+                    Integer.parseInt(packetContent.substring(56, 72), 2)
+            };
+
+            int[] messagePorts = {
+                    Integer.parseInt(packetContent.substring(72, 88), 2),
+                    Integer.parseInt(packetContent.substring(88, 104), 2),
+                    Integer.parseInt(packetContent.substring(104, 120), 2)
+            };
+
+            parsedPacket.setMessagePorts(messagePorts);
+            parsedPacket.setAckPorts(ackPorts);
+            parsedPacket.setData(packetContent.substring(120).getBytes());
+        }
+
+        return parsedPacket;
     }
 
 }

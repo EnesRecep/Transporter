@@ -1,7 +1,10 @@
 package communication;
 
 import Model.*;
+import Utils.PacketHandler;
 import Utils.PortHandler;
+import exceptions.PacketListenException;
+import exceptions.PacketSendException;
 import pool.ServerListenerPool;
 
 import javax.sound.sampled.Port;
@@ -17,27 +20,29 @@ public class HandshakeCommunication {
     private Server server;
     private boolean state;
     private PortHandler portHandler;
+    private PacketHandler packetHandler;
     private Packet packetParser;
     private int[] ackPortsListen;
     private int[] messagePortsListen;
     private int[] messagePortsSend;
 
     public HandshakeCommunication(){
-        
+        packetHandler = new PacketHandler();
     }
 
     public void sendHandshakeACK(DatagramPacket receivedHandshakePacket){
 
-        packetParser.parsePacket(receivedHandshakePacket);
+//        packetParser.parsePacket(receivedHandshakePacket);
 
+        Packet packet = packetHandler.parsePacket(receivedHandshakePacket);
         for(int i = 0 ; i < Constants.MAX_TEST_TIME ; i++){
-            client.sendPacket(null, receivedHandshakePacket.getAddress().toString(), packetParser.getAckPorts()[i%3]);
+            client.sendPacket(null, receivedHandshakePacket.getAddress().toString(), packet.getAckPorts()[i%3]);
         }
 
         //Call Omer's Listen method
     }
 
-    public void sendHandshake(String addr){
+    public void sendHandshake(String addr)throws PacketSendException, PacketListenException{
 
         if(!state)
             throw new PacketSendException("The communication is close!");
@@ -49,10 +54,11 @@ public class HandshakeCommunication {
 
                 DatagramPacket sendingPacket = client.sendPacket(null, addr, portHandler.createPortNumberFromDestinationHostname(addr)[i%3]);
 
-                packetParser.parsePacket(sendingPacket);
+//                packetParser.parsePacket(sendingPacket);
 
-                ackPortsListen = packetParser.getAckPorts();
-                messagePortsListen = packetParser.getMessagePorts();
+                Packet sendingPack = packetHandler.parsePacket(sendingPacket);
+                ackPortsListen = sendingPack.getAckPorts();
+                messagePortsListen = sendingPack.getMessagePorts();
 
                 DatagramPacket receivingPacket = waitHandshakePacket(ackPortsListen);
                 if(receivingPacket == null)
@@ -69,7 +75,7 @@ public class HandshakeCommunication {
         }
     }
 
-    public DatagramPacket waitHandshakePacket(int[] ackPorts){
+    public DatagramPacket waitHandshakePacket(int[] ackPorts) throws PacketListenException{
 
         if(!state)
             throw new PacketListenException("The communication is close!");
@@ -81,7 +87,7 @@ public class HandshakeCommunication {
 
     }
 
-    public void  startHandshake(String addr){
+    public void  startHandshake(String addr)throws PacketSendException, PacketListenException{
 
 
         state = true;

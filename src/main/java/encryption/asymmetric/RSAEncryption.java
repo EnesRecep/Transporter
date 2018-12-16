@@ -14,12 +14,12 @@ import java.security.spec.X509EncodedKeySpec;
 /**
  * RSA encryption operations:
  * 1. Generate new public - private key pair
- * 2. Encrypt a secret key with public key
- * 3. Decrypt an encrypted secret key with private key
+ * 2. Encrypt a string or byte array with public key
+ * 3. Decrypt an encrypted string or byte array with private key
  * 4. Build public or private key from existing keys
  *
  * @author 19XLR95
- * @version 2.1
+ * @version 3.1
  * @since 07.11.2018
  **/
 public class RSAEncryption
@@ -94,6 +94,50 @@ public class RSAEncryption
   }
 
   /**
+   * Encrypt a byte array with public key
+   *
+   * @param publicKey the public key that will be used for text encryption
+   * @param dataToEncrypt a byte array that will be encrypted
+   *
+   * @return encrypted byte array
+   **/
+  public byte[] encryptWithPublicKey(String publicKey, byte[] dataToEncrypt)
+  {
+    try
+    {
+      RSAPublicKey pubKey = buildPublicKey(publicKey);
+
+      Cipher theCipher = Cipher.getInstance("RSA");
+      theCipher.init(Cipher.ENCRYPT_MODE, pubKey);
+
+      byte[] encryptedText = theCipher.doFinal(dataToEncrypt);
+
+      return Base64.encode(encryptedText).getBytes();
+    }
+    catch(NoSuchAlgorithmException e)
+    {
+      e.printStackTrace();
+    }
+    catch(NoSuchPaddingException e)
+    {
+      e.printStackTrace();
+    }
+    catch(InvalidKeyException e)
+    {
+      e.printStackTrace();
+    }catch(BadPaddingException e)
+    {
+      e.printStackTrace();
+    }
+    catch(IllegalBlockSizeException e)
+    {
+      e.printStackTrace();
+    }
+
+    return null;
+  }
+
+  /**
    * Decrypt an encrypted text with private key
    *
    * @param privateKey the private key that will be used for text decryption
@@ -113,6 +157,55 @@ public class RSAEncryption
       byte[] encryptedText = Base64.decode(encryptedTextToDecrypt);
 
       return new String(theCipher.doFinal(encryptedText));
+    }
+    catch(NoSuchAlgorithmException e)
+    {
+      e.printStackTrace();
+    }
+    catch(NoSuchPaddingException e)
+    {
+      e.printStackTrace();
+    }
+    catch(InvalidKeyException e)
+    {
+      e.printStackTrace();
+    }
+    catch(BadPaddingException e)
+    {
+      e.printStackTrace();
+    }
+    catch(IllegalBlockSizeException e)
+    {
+      e.printStackTrace();
+    }
+    catch(Base64DecodingException e)
+    {
+      e.printStackTrace();
+    }
+
+    return null;
+  }
+
+  /**
+   * Decrypt an encrypted byte array with private key
+   *
+   * @param privateKey the private key that will be used for text decryption
+   * @param encryptedDataToDecrypt an encrypted byte array that will be decrypted
+   *
+   * @return decrypted byte array
+   **/
+  public byte[] decryptWithPrivateKey(String privateKey, byte[] encryptedDataToDecrypt)
+  {
+    try
+    {
+      RSAPrivateKey priKey = buildPrivateKey(privateKey);
+
+      Cipher theCipher = Cipher.getInstance("RSA");
+      theCipher.init(Cipher.DECRYPT_MODE, priKey);
+
+      byte[] encryptedData = Base64.decode(encryptedDataToDecrypt);
+
+      return new String(theCipher.doFinal(encryptedData)).getBytes();
     }
     catch(NoSuchAlgorithmException e)
     {
