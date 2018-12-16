@@ -28,6 +28,14 @@ public class SocketHandler {
         this.packetType = packetType;
     }
 
+    public DatagramSocket getSocket() {
+        return socket;
+    }
+
+    public void setSocket(DatagramSocket socket) {
+        this.socket = socket;
+    }
+
     public void openSocket(){
         try {
             socket = new DatagramSocket(porthandler.getPort());
