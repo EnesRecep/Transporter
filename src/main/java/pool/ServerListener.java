@@ -1,6 +1,6 @@
 package pool;
 
-import Model.Server;
+import Utils.SocketHandler;
 
 import java.net.DatagramPacket;
 
@@ -9,7 +9,7 @@ import java.net.DatagramPacket;
  */
 public class ServerListener implements Runnable {
 
-    private Server server = new Server();
+    private SocketHandler socketHandler = new SocketHandler();
     private ServerListenerPool pool;
     private int port;
     private DatagramPacket packet;
@@ -35,7 +35,7 @@ public class ServerListener implements Runnable {
         DatagramPacket tempPacket;
         do {
 
-            tempPacket = server.waitForPacket(port);
+            tempPacket = socketHandler.waitForPacket(port);
             if(tempPacket.getData() != null){
                 packet = tempPacket;
                 pool.notifyFound(packet);

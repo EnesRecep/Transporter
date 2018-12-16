@@ -252,4 +252,16 @@ public class PacketHandler {
         return parsedPacket;
     }
 
+    /**
+     * Identifies and returns communication packet type
+     *
+     * @param packet a datagram packet that will be identified
+     *
+     * @return the packet type (00, 01, 10, 11 - see RFC v2.0)
+     **/
+    public PacketTypeFlag getPacketTypeFlag(DatagramPacket packet)
+    {
+        return new PacketHandler().parsePacket(packet).getPacketTypeFlag();
+    }
+
 }

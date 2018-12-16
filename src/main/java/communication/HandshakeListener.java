@@ -1,6 +1,5 @@
 package communication;
 
-import Model.Server;
 import Utils.PortHandler;
 
 import java.net.DatagramPacket;
