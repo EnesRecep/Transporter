@@ -41,6 +41,7 @@ public class Client {
             packet = packetType.createPacket(byteData, addr, port);
             socket.send(packet);
         } catch (IOException e) {
+
             e.printStackTrace();
         }
         return packet;
