@@ -92,9 +92,6 @@ public class HandshakeCommunication {
 
         state = true;
 
-        if(server == null)
-            server = new Server();
-
         if(client == null)
             client = new Client();
 
