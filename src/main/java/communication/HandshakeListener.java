@@ -15,6 +15,8 @@ public class HandshakeListener implements Runnable {
     int port;
     CommunicationPool pool;
 
+
+    //When handshake arrives, start a new communication
     public HandshakeListener(){
         pool = CommunicationPool.getInstance();
     }

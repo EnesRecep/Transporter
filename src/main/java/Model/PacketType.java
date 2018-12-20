@@ -9,6 +9,8 @@ import java.net.DatagramPacket;
 
 public interface PacketType {
 
+    //Strategy Pattern
+
     public DatagramPacket[] createPacket(Object data, String addr, int port);
 
 }

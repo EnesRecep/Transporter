@@ -1,6 +1,7 @@
 package pool;
 
 import communication.Constants;
+import enums.PacketTypeFlag;
 
 import java.net.DatagramPacket;
 import java.util.ArrayList;
@@ -23,7 +24,8 @@ public class ServerListenerPool {
     }
 
 
-    public DatagramPacket threadPoolRunner(int[] ports){
+    public DatagramPacket threadPoolRunner(int[] ports, int timeOut){
+        maxAttempt = timeOut * 100;
 
 
         for(int i = 0 ; i < ports.length ; i++) {
@@ -36,6 +38,7 @@ public class ServerListenerPool {
 
         while(true){
             if(found){
+                terminate();
                 return receivedPacket;
             }else{
                 try {
