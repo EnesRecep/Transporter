@@ -22,8 +22,8 @@ public class SHA256 {
             md = MessageDigest.getInstance("SHA256");
             byte[] messageDigest = md.digest(data);
             BigInteger bigInteger = new BigInteger(1,messageDigest);
-            hashText = bigInteger.toString();
-
+            hashText = bigInteger.toString(16);
+                
             while (hashText.length() < 32) {
                 hashText = "0" + hashText;
             }
