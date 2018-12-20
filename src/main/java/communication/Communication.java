@@ -1,25 +1,80 @@
 package communication;
 
+import Model.Packet;
 import Model.PacketType;
 import Utils.PacketHandler;
 import Utils.PortHandler;
 import Utils.SocketHandler;
+import enums.PacketTypeFlag;
 import exceptions.PacketListenException;
 import exceptions.PacketSendException;
+import pool.ServerListenerPool;
 
 import java.net.DatagramPacket;
 
 /**
  * Created by Enes Recep on 15.12.2018.
  */
-public class Communication implements Runnable{
+public class Communication {
 
     private String oppositeAddr;
     private DatagramPacket handshakePacket;
     private boolean isCommunicationStartedByUs;
-    HandshakeCommunication handshakeCommunication = new HandshakeCommunication();
-    PortHandler handler = new PortHandler();
+    private HandshakeCommunication handshakeCommunication = new HandshakeCommunication();
+    private MessageCommunication messageCommunication = new MessageCommunication();
+    private PortHandler portHandler = new PortHandler();
+    private PacketHandler packetHandler;
+
+    private int[] messagePortsListen;
+    private int[] messagePortsSend;
+
+    private int[] ackPortsListen;
+    private int[] ackPortsSend;
+
+    private boolean isHandshakeDone = false;
+
     private PacketType packetType;
+
+    public int[] getMessagePortsListen() {
+        return messagePortsListen;
+    }
+
+    public void setMessagePortsListen(int[] messagePortsListen) {
+        this.messagePortsListen = messagePortsListen;
+        handshakeCommunication.setMessagePortsListen(messagePortsListen);
+        messageCommunication.setMessagePortsListen(messagePortsListen);
+    }
+
+    public int[] getMessagePortsSend() {
+        return messagePortsSend;
+    }
+
+    public void setMessagePortsSend(int[] messagePortsSend) {
+        this.messagePortsSend = messagePortsSend;
+        handshakeCommunication.setMessagePortsSend(messagePortsSend);
+        messageCommunication.setMessagePortsSend(messagePortsSend);
+
+    }
+
+    public int[] getAckPortsListen() {
+        return ackPortsListen;
+    }
+
+    public void setAckPortsListen(int[] ackPortsListen) {
+        this.ackPortsListen = ackPortsListen;
+        handshakeCommunication.setAckPortsListen(ackPortsListen);
+        messageCommunication.setAckPortsListen(ackPortsListen);
+    }
+
+    public int[] getAckPortsSend() {
+        return ackPortsSend;
+    }
+
+    public void setAckPortsSend(int[] ackPortsSend) {
+        this.ackPortsSend = ackPortsSend;
+        handshakeCommunication.setAckPortsSend(ackPortsSend);
+        messageCommunication.setAckPortsSend(ackPortsSend);
+    }
 
     public void setHandshakePacket(DatagramPacket handshakePacket) {
         this.handshakePacket = handshakePacket;
@@ -47,18 +102,57 @@ public class Communication implements Runnable{
         isCommunicationStartedByUs = communicationStartedByUs;
     }
 
-    @Override
-    public void run() {
-        if(isCommunicationStartedByUs){
-            try {
-                handshakeCommunication.sendHandshake(oppositeAddr);
-            } catch (PacketSendException e) {
-                e.printStackTrace();
-            } catch (PacketListenException e) {
-                e.printStackTrace();
+    public void keepSendingACK(DatagramPacket receivedhandshake){
+        handshakeCommunication.sendHandshakeACK(receivedhandshake);
+
+    }
+
+    public Object communicationWait() {
+        try {
+            handshakeCommunication.waitHandshakePacket();
+
+            Thread thread = new Thread(handshakeCommunication);
+            thread.start();
+
+        } catch (PacketListenException e) {
+            e.printStackTrace();
+        }
+        return waitForMessage(messagePortsListen);
+    }
+
+    public Object communicationWait(String oppositeAddr) {
+        try {
+            Packet handShakeACKPacket = handshakeCommunication.sendHandshake(oppositeAddr);
+            if(handShakeACKPacket.getPacketTypeFlag().equals(PacketTypeFlag.ACK_PACKET))
+                isHandshakeDone = true;
+            while (!isHandshakeDone) {
+                Thread.sleep(10);
             }
-        }else{
-            handshakeCommunication.sendHandshakeACK(handshakePacket);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (PacketListenException e) {
+            e.printStackTrace();
+        } catch (PacketSendException e) {
+            e.printStackTrace();
+        }
+        return waitForMessage(messagePortsListen);
+    }
+
+    public Object waitForMessage(int[] ports) {
+        DatagramPacket receivedMessage = null;
+        while (true) {
+            ServerListenerPool messagePool = new ServerListenerPool();
+            receivedMessage = messagePool.threadPoolRunner(ports, Constants.MESSAGE_TIMEOUT);
+            if (receivedMessage != null) {
+                handshakeCommunication.setExecution(false);
+                break;
+            }
+        }
+        while(true) {
+            Object object = packetHandler.addPacket(receivedMessage);
+            if(object != null)
+                return object;
+
         }
     }
 
@@ -67,7 +161,7 @@ public class Communication implements Runnable{
     If a received message's flag is FINPacket after ACK is sent and FIN_TIMEOUT passes this emthod will be called.
     If we send a FINPacket after sending the packet this method will be called.
      */
-    public void FINProcedure(){
+    public void FINProcedure() {
 
         SocketHandler socketHandler = new SocketHandler();
         socketHandler.getSocket().close();
@@ -75,5 +169,7 @@ public class Communication implements Runnable{
         CommunicationPool.getInstance().removeCommunication(this);
 
     }
+
+
 
 }

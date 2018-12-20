@@ -38,13 +38,11 @@ public class PacketHandler {
         return packetData;
     }
 
-    public void addPacket(DatagramPacket datagramPacket){
+    public Object addPacket(DatagramPacket datagramPacket){
 
         Object object = dataExtraction(datagramPacket);
 
-        if(object != null){
-            //notify(object);
-        }
+        return object;
     }
 
     /*
