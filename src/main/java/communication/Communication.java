@@ -6,6 +6,7 @@ import Utils.PacketHandler;
 import Utils.PortHandler;
 import Utils.SocketHandler;
 import enums.PacketTypeFlag;
+import exceptions.CommunicationDataException;
 import exceptions.PacketListenException;
 import exceptions.PacketSendException;
 import pool.ServerListenerPool;
@@ -23,7 +24,8 @@ public class Communication {
     private HandshakeCommunication handshakeCommunication = new HandshakeCommunication();
     private MessageCommunication messageCommunication = new MessageCommunication();
     private PortHandler portHandler = new PortHandler();
-    private PacketHandler packetHandler;
+    private PacketHandler packetHandler = new PacketHandler();
+    private SocketHandler socketHandler = new SocketHandler();
 
     private int[] messagePortsListen;
     private int[] messagePortsSend;
@@ -102,7 +104,7 @@ public class Communication {
         isCommunicationStartedByUs = communicationStartedByUs;
     }
 
-    public void keepSendingACK(DatagramPacket receivedhandshake){
+    public void keepSendingACK(DatagramPacket receivedhandshake) {
         handshakeCommunication.sendHandshakeACK(receivedhandshake);
 
     }
@@ -123,13 +125,8 @@ public class Communication {
     public Object communicationWait(String oppositeAddr) {
         try {
             Packet handShakeACKPacket = handshakeCommunication.sendHandshake(oppositeAddr);
-            if(handShakeACKPacket.getPacketTypeFlag().equals(PacketTypeFlag.ACK_PACKET))
+            if (handShakeACKPacket.getPacketTypeFlag().equals(PacketTypeFlag.ACK_PACKET))
                 isHandshakeDone = true;
-            while (!isHandshakeDone) {
-                Thread.sleep(10);
-            }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
         } catch (PacketListenException e) {
             e.printStackTrace();
         } catch (PacketSendException e) {
@@ -138,19 +135,40 @@ public class Communication {
         return waitForMessage(messagePortsListen);
     }
 
+    public void send(Object data, String oppositeAddr) {
+        Packet handShakeACKPacket = null;
+
+        try {
+
+            handShakeACKPacket = handshakeCommunication.sendHandshake(oppositeAddr);
+            if (handShakeACKPacket.getPacketTypeFlag().equals(PacketTypeFlag.ACK_PACKET))
+                isHandshakeDone = true;
+
+            messageCommunication.setMessagePortsListen(handShakeACKPacket.getMessagePorts());
+            messageCommunication.startMessageCommunication(data, true);
+
+        } catch (PacketSendException e) {
+            e.printStackTrace();
+        } catch (PacketListenException e) {
+            e.printStackTrace();
+        } catch (CommunicationDataException e) {
+            e.printStackTrace();
+        }
+
+    }
+
     public Object waitForMessage(int[] ports) {
         DatagramPacket receivedMessage = null;
-        while (true) {
-            ServerListenerPool messagePool = new ServerListenerPool();
-            receivedMessage = messagePool.threadPoolRunner(ports, Constants.MESSAGE_TIMEOUT);
-            if (receivedMessage != null) {
-                handshakeCommunication.setExecution(false);
-                break;
-            }
+
+        ServerListenerPool messagePool = new ServerListenerPool();
+        receivedMessage = messagePool.threadPoolRunner(ports, Constants.MESSAGE_TIMEOUT);
+        if (receivedMessage != null) {
+            handshakeCommunication.setExecution(false);
         }
-        while(true) {
+
+        while (true) {
             Object object = packetHandler.addPacket(receivedMessage);
-            if(object != null)
+            if (object != null)
                 return object;
 
         }
@@ -169,7 +187,6 @@ public class Communication {
         CommunicationPool.getInstance().removeCommunication(this);
 
     }
-
 
 
 }

@@ -109,7 +109,7 @@ public class MessageCommunication {
     }
 
 
-    public void startMessageCommunication(boolean isCommunicationStartedByUs) throws CommunicationDataException, PacketSendException {
+    public void startMessageCommunication(Object outgoingData, boolean isCommunicationStartedByUs) throws CommunicationDataException, PacketSendException {
 
         if (outgoingData == null)
             throw new CommunicationDataException("The communication data is null!");
@@ -134,12 +134,13 @@ public class MessageCommunication {
                 if (receivedACK == null) {
                     continue;
                 }
-                if (  /* hash of packet.data == received.ack.data*/) {
+                //if (  ) {
+                    messagePortsSend = packetHandler.parsePacket(receivedACK).getMessagePorts();
                     if (packetHandler.getPacketTypeFlag(packets[i]).equals(PacketTypeFlag.FIN_PACKET)) {
                         new Communication().FINProcedure();
                     }
                     break;
-                }
+                //}
             }
         }
 
