@@ -12,6 +12,7 @@ import exceptions.PacketSendException;
 import pool.ServerListenerPool;
 
 import java.net.DatagramPacket;
+import java.net.SocketException;
 
 /**
  * Created by Enes Recep on 15.12.2018.
@@ -21,7 +22,7 @@ public class Communication {
     private String oppositeAddr;
     private DatagramPacket handshakePacket;
     private boolean isCommunicationStartedByUs;
-    private HandshakeCommunication handshakeCommunication = new HandshakeCommunication();
+    private HandshakeCommunication handshakeCommunication;
     private MessageCommunication messageCommunication = new MessageCommunication();
     private PortHandler portHandler = new PortHandler();
     private PacketHandler packetHandler = new PacketHandler();
@@ -36,6 +37,9 @@ public class Communication {
     private boolean isHandshakeDone = false;
 
     private PacketType packetType;
+
+    public Communication() throws SocketException {
+    }
 
     public int[] getMessagePortsListen() {
         return messagePortsListen;
@@ -137,6 +141,13 @@ public class Communication {
 
     public void send(Object data, String oppositeAddr) {
         Packet handShakeACKPacket = null;
+        System.out.println("Sending");
+        try {
+            handshakeCommunication = new HandshakeCommunication();
+        } catch (SocketException e) {
+            e.printStackTrace();
+        }
+        handshakeCommunication.setState(true);
 
         try {
 
@@ -144,6 +155,7 @@ public class Communication {
             if (handShakeACKPacket.getPacketTypeFlag().equals(PacketTypeFlag.ACK_PACKET))
                 isHandshakeDone = true;
 
+            System.out.println("Getting ACK");
             messageCommunication.setMessagePortsListen(handShakeACKPacket.getMessagePorts());
             messageCommunication.startMessageCommunication(data, true);
 
@@ -181,10 +193,15 @@ public class Communication {
      */
     public void FINProcedure() {
 
-        SocketHandler socketHandler = new SocketHandler();
+        SocketHandler socketHandler = null;
+        try {
+            socketHandler = new SocketHandler();
+        } catch (SocketException e) {
+            e.printStackTrace();
+        }
         socketHandler.getSocket().close();
 
-        CommunicationPool.getInstance().removeCommunication(this);
+        //CommunicationPool.getInstance().removeCommunication(this);
 
     }
 

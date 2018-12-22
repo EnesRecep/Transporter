@@ -1,6 +1,7 @@
 package Model;
 
 import Utils.PacketHandler;
+import Utils.PortHandler;
 import Utils.Serializer;
 import enums.BitTypeFlag;
 import enums.MaxPacketSize;
@@ -26,6 +27,8 @@ public class PacketCreator
       Random random = new Random();
       int partition = random.nextInt(16);
 
+      PortHandler portHandler = new PortHandler();
+
       for(int i = 0; i < dataChunks.size(); i++)
       {
         StringBuilder header = new StringBuilder();
@@ -44,13 +47,20 @@ public class PacketCreator
 
         header.append(packetType.toString());
 
-        Server server = new Server();
+
 
         for(int j = (packetType == PacketTypeFlag.ACK_PACKET ? 1 : 2); j > 0 ; j--)
         {
-          header.append(packetHandler.toBinary(server.getPort(), BitTypeFlag.TO_16_BIT));
-          header.append(packetHandler.toBinary(server.getPort(), BitTypeFlag.TO_16_BIT));
-          header.append(packetHandler.toBinary(server.getPort(), BitTypeFlag.TO_16_BIT));
+            System.out.println("PORTs:");
+          int port = portHandler.getPort();
+            System.out.println(port);
+          header.append(packetHandler.toBinary(port, BitTypeFlag.TO_16_BIT));
+          port = portHandler.getPort();
+            System.out.println(port);
+          header.append(packetHandler.toBinary(port, BitTypeFlag.TO_16_BIT));
+          port = portHandler.getPort();
+            System.out.println(port);
+          header.append(packetHandler.toBinary(port, BitTypeFlag.TO_16_BIT));
         }
 
         byte[] wholePacketContent = ArrayUtils.addAll(

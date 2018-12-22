@@ -12,9 +12,12 @@ import java.net.*;
 public class SocketHandler {
 
     private PacketType packetType;
-    private DatagramSocket socket;
-    private PortHandler porthandler;
+    private DatagramSocket socket = new DatagramSocket();
+    private PortHandler porthandler = new PortHandler();
     private DatagramPacket recvPacket;
+
+    public SocketHandler() throws SocketException {
+    }
 
 
     //private byte[] buffer = new byte[256];

@@ -4,6 +4,7 @@ import communication.Constants;
 import enums.PacketTypeFlag;
 
 import java.net.DatagramPacket;
+import java.net.SocketException;
 import java.util.ArrayList;
 
 /**
@@ -15,7 +16,7 @@ public class ServerListenerPool {
     boolean found = false;
     DatagramPacket receivedPacket;
     ServerListenerPool s;
-    ArrayList<ServerListener> listeners;
+    ArrayList<ServerListener> listeners = new ArrayList<>();
     int maxAttempt = Constants.ACK_TIMEOUT * 100; //Timeout in millis / 10 milliseconds
 
     public ServerListenerPool(){
@@ -29,7 +30,12 @@ public class ServerListenerPool {
 
 
         for(int i = 0 ; i < ports.length ; i++) {
-            ServerListener listener = new ServerListener(ports[i],s);
+            ServerListener listener = null;
+            try {
+                listener = new ServerListener(ports[i],s);
+            } catch (SocketException e) {
+                e.printStackTrace();
+            }
             Thread thread = new Thread(listener);
             listeners.add(listener);
             thread.start();

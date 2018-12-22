@@ -7,13 +7,17 @@ import java.net.DatagramPacket;
 /**
  * Created by Enes Recep on 15.12.2018.
  */
-public class HandshakeListener implements Runnable {
+public class HandshakeListener  {
 
-    Server server = new Server();
+    /*
+
     DatagramPacket packet;
     PortHandler handler = new PortHandler();
     int port;
     CommunicationPool pool;
+    Communication communication = new Communication();
+    HandshakeCommunication handshakeCommunication = new HandshakeCommunication();
+    MessageCommunication messageCommunication = new MessageCommunication();
 
 
     //When handshake arrives, start a new communication
@@ -24,7 +28,7 @@ public class HandshakeListener implements Runnable {
     public void run() {
         DatagramPacket tempPacket;
         do {
-            tempPacket = server.waitForPacket(port);
+            tempPacket = communication.waitForPacket(port);
             if(tempPacket.getData() != null){
                 packet = tempPacket;
                 Communication communication = new Communication();
@@ -36,4 +40,6 @@ public class HandshakeListener implements Runnable {
             }
         }while(packet == null );
     }
+
+    */
 }
