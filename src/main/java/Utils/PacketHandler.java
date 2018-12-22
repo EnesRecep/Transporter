@@ -236,6 +236,7 @@ public class PacketHandler {
                     Integer.parseInt(packetContent.substring(56, 72), 2)
             };
 
+            System.out.println("Parser ACK Ports"+ackPorts[0]);
             int[] messagePorts = {
                     Integer.parseInt(packetContent.substring(72, 88), 2),
                     Integer.parseInt(packetContent.substring(88, 104), 2),

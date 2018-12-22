@@ -11,7 +11,7 @@ import static org.junit.Assert.*;
  * Created by Enes Recep on 15.12.2018.
  */
 public class CommunicationTests {
-
+/*
     @Test
     public void setHandshakePacketTest(){
         HandshakePacket packet = new HandshakePacket();
@@ -23,6 +23,6 @@ public class CommunicationTests {
 
         assertEquals(communication.getHandshakePacket(),handshake);
     }
-
+*/
 
 }

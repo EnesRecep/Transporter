@@ -9,6 +9,7 @@ import java.util.ArrayList;
  */
 public class CommunicationPool {
 
+    /*
     private ArrayList<Communication> communications;
     private static CommunicationPool pool;
 
@@ -51,4 +52,6 @@ public class CommunicationPool {
     public void removeCommunication(Communication communication){
         communications.remove(communication);
     }
+
+    */
 }

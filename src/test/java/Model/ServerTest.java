@@ -9,6 +9,7 @@ import static org.junit.Assert.*;
 /**
  * Created by Enes Recep on 23.11.2018.
  */
+/*
 public class ServerTest {
 
     @Test
@@ -19,9 +20,9 @@ public class ServerTest {
         assertNotNull(server.getSocket());
     }
 
-    /**
+
      * Test 'getPacketTypeFlag' function ability
-     **/
+
     @Test
     public void getPacketTypeTest()
     {
@@ -34,4 +35,7 @@ public class ServerTest {
         assertEquals("10", server.getPacketTypeFlag(datagramPacket).toString());
     }
 
-}
+
+
+
+*/

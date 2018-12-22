@@ -11,6 +11,7 @@ import pool.ServerListenerPool;
 
 import javax.xml.crypto.Data;
 import java.net.DatagramPacket;
+import java.net.SocketException;
 import java.net.SocketTimeoutException;
 
 /**
@@ -137,7 +138,11 @@ public class MessageCommunication {
                 //if (  ) {
                     messagePortsSend = packetHandler.parsePacket(receivedACK).getMessagePorts();
                     if (packetHandler.getPacketTypeFlag(packets[i]).equals(PacketTypeFlag.FIN_PACKET)) {
-                        new Communication().FINProcedure();
+                        try {
+                            new Communication().FINProcedure();
+                        } catch (SocketException e) {
+                            e.printStackTrace();
+                        }
                     }
                     break;
                 //}

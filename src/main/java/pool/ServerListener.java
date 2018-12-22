@@ -3,6 +3,7 @@ package pool;
 import Utils.SocketHandler;
 
 import java.net.DatagramPacket;
+import java.net.SocketException;
 
 /**
  * Created by Enes Recep on 11.12.2018.
@@ -21,7 +22,7 @@ public class ServerListener implements Runnable {
         this.execution = execution;
     }
 
-    public ServerListener(int port, ServerListenerPool pool){
+    public ServerListener(int port, ServerListenerPool pool) throws SocketException {
         this.port = port;
         this.pool = pool;
     }
@@ -35,6 +36,7 @@ public class ServerListener implements Runnable {
         DatagramPacket tempPacket;
         do {
 
+            System.out.println(port);
             tempPacket = socketHandler.waitForPacket(port);
             if(tempPacket.getData() != null){
                 packet = tempPacket;

@@ -81,7 +81,7 @@ public class PortHandler {
 
     public int[] createPortNumberFromDestinationHostname(String ip){
 
-        ip = ip.replaceAll(".","");
+        ip = ip.replaceAll("\\.","");
 
         int initial = (int) (Long.valueOf(ip) % 21846);
         if(initial < 1024)
@@ -102,6 +102,8 @@ public class PortHandler {
         } catch (SocketException e) {
             e.printStackTrace();
         }
+
+        System.out.println(ip);
 
         return ip;
     }

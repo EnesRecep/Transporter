@@ -10,6 +10,7 @@ import pool.ServerListenerPool;
 
 import javax.sound.sampled.Port;
 import java.net.DatagramPacket;
+import java.net.SocketException;
 
 /**
  * Created by Enes Recep on 8.12.2018.
@@ -19,9 +20,9 @@ public class HandshakeCommunication extends Communication implements Runnable {
 
     private boolean isSending;
     private boolean state;
-    private PortHandler portHandler;
+    private PortHandler portHandler = new PortHandler();
     private PacketHandler packetHandler;
-    private SocketHandler socketHandler;
+    private SocketHandler socketHandler = new SocketHandler();
     private PacketType packetType;
     private DatagramPacket handShakePacket;
 
@@ -33,6 +34,14 @@ public class HandshakeCommunication extends Communication implements Runnable {
     private int[] messagePortsListen;
     private int[] messagePortsSend;
 
+
+    public boolean isState() {
+        return state;
+    }
+
+    public void setState(boolean state) {
+        this.state = state;
+    }
 
     @Override
     public int[] getAckPortsSend() {
@@ -82,7 +91,7 @@ public class HandshakeCommunication extends Communication implements Runnable {
         this.execution = execution;
     }
 
-    public HandshakeCommunication() {
+    public HandshakeCommunication() throws SocketException {
         packetHandler = new PacketHandler();
     }
 
@@ -110,13 +119,16 @@ public class HandshakeCommunication extends Communication implements Runnable {
 
             //Creating handshake packet and send to opposite user
             //TODO : instead of null send our public key
+            packetType = new HandshakePacket();
             DatagramPacket[] sendingPackets = packetType.createPacket(null, addr, portHandler.createPortNumberFromDestinationHostname(addr)[i % 3]);
             socketHandler.sendPacket(sendingPackets[0]);
 
             Packet sendingPack = packetHandler.parsePacket(sendingPackets[0]);
             ackPortsListen = sendingPack.getAckPorts();
+            System.out.println("ACK ports: "+ ackPortsListen[0]);
             messagePortsListen = sendingPack.getMessagePorts();
 
+            System.out.println("Waiting for ACK");
             DatagramPacket receivingPacket = (DatagramPacket) super.waitForMessage(ackPortsListen);
             if(receivingPacket == null)
                 continue;
@@ -131,6 +143,7 @@ public class HandshakeCommunication extends Communication implements Runnable {
 
         }
 
+        System.out.println("Returning : " + receivedPacket.toString());
         return receivedPacket;
 
     }
