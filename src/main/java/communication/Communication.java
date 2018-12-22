@@ -23,7 +23,7 @@ public class Communication {
     private DatagramPacket handshakePacket;
     private boolean isCommunicationStartedByUs;
     private HandshakeCommunication handshakeCommunication;
-    private MessageCommunication messageCommunication = new MessageCommunication();
+    private MessageCommunication messageCommunication;
     private PortHandler portHandler = new PortHandler();
     private PacketHandler packetHandler = new PacketHandler();
     private SocketHandler socketHandler = new SocketHandler();
@@ -115,6 +115,8 @@ public class Communication {
 
     public Object communicationWait() {
         try {
+            handshakeCommunication = new HandshakeCommunication();
+            handshakeCommunication.setState(true);
             handshakeCommunication.waitHandshakePacket();
 
             Thread thread = new Thread(handshakeCommunication);
@@ -122,18 +124,24 @@ public class Communication {
 
         } catch (PacketListenException e) {
             e.printStackTrace();
+        } catch (SocketException e) {
+            e.printStackTrace();
         }
         return waitForMessage(messagePortsListen);
     }
 
     public Object communicationWait(String oppositeAddr) {
         try {
+             handshakeCommunication = new HandshakeCommunication();
+             handshakeCommunication.setState(true);
             Packet handShakeACKPacket = handshakeCommunication.sendHandshake(oppositeAddr);
             if (handShakeACKPacket.getPacketTypeFlag().equals(PacketTypeFlag.ACK_PACKET))
                 isHandshakeDone = true;
         } catch (PacketListenException e) {
             e.printStackTrace();
         } catch (PacketSendException e) {
+            e.printStackTrace();
+        } catch (SocketException e) {
             e.printStackTrace();
         }
         return waitForMessage(messagePortsListen);
@@ -175,7 +183,12 @@ public class Communication {
         ServerListenerPool messagePool = new ServerListenerPool();
         receivedMessage = messagePool.threadPoolRunner(ports, Constants.MESSAGE_TIMEOUT);
         if (receivedMessage != null) {
-            handshakeCommunication.setExecution(false);
+            try {
+                handshakeCommunication = new HandshakeCommunication();
+                handshakeCommunication.setExecution(false);
+            } catch (SocketException e) {
+                e.printStackTrace();
+            }
         }
 
         while (true) {

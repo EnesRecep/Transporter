@@ -71,6 +71,9 @@ public class SocketHandler {
 
         try {
             socket = new DatagramSocket(port);
+            byte buffer[] = new byte[256];
+            recvPacket = new DatagramPacket(buffer,buffer.length);
+            System.out.println("Waiting for packet:");
             socket.receive(recvPacket);
         } catch (SocketTimeoutException ste) {
             ste.getSuppressed();
