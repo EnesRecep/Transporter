@@ -28,9 +28,9 @@ public class CommunicationPool {
         Communication communication = new Communication();
         communication.setOppositeAddr(addr);
         communication.setCommunicationStartedByUs(true);
-        Thread thread = new Thread(communication);
+        //Thread thread = new Thread(communication);
 
-        thread.start();
+        //thread.start();
     }
 
     public void waitForCommunication(){
