@@ -22,7 +22,8 @@ public class Main {
         }
         String str = "We will rock you";
 
-        communication.send(str,"192.168.0.55");
+        Object object = communication.communicationWait();
+        System.out.println(object.toString());
 
 
 
