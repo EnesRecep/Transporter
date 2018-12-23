@@ -140,7 +140,7 @@ public class HandshakeCommunication implements Runnable {
             communication.setMessagePortsListen(messagePortsListen);
 
             System.out.println("Waiting for ACK");
-            DatagramPacket receivingPacket = (DatagramPacket) communication.waitForMessage(ackPortsListen);
+            Object receivingPacket = communication.waitForMessage(ackPortsListen);
             if(receivingPacket == null)
                 continue;
 
