@@ -32,7 +32,7 @@ public class ServerListenerPool {
         for(int i = 0 ; i < ports.length ; i++) {
             ServerListener listener = null;
             try {
-                listener = new ServerListener(ports[i],s);
+                listener = new ServerListener(ports[i],this);
             } catch (SocketException e) {
                 e.printStackTrace();
             }

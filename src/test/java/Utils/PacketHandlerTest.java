@@ -22,15 +22,9 @@ public class PacketHandlerTest {
         Packet packet = new Packet(datagramPacket);
         Object object = null,extractedObject = null;
 
-        try {
-            object = Serializer.deserialize(packet.getData());
-            PacketHandler packetHandler = new PacketHandler();
-            extractedObject = packetHandler.extractPacketData(packet);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+        object = Serializer.deserialize2(packet.getData());
+        PacketHandler packetHandler = new PacketHandler();
+        extractedObject = packetHandler.extractPacketData(packet);
 
         assertEquals((String)object, (String)extractedObject);
     }

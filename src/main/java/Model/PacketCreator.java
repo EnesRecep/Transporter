@@ -18,9 +18,11 @@ public class PacketCreator
 {
   public DatagramPacket[] createPacket(Object data, String destAddress, int destPort, PacketTypeFlag packetType)
   {
+    UserData userData = new UserData(data);
+    data = userData;
     try
     {
-      byte[] userDataBytes = Serializer.serialize(data);
+      byte[] userDataBytes = Serializer.serialize2(data);
       PacketHandler packetHandler = new PacketHandler();
       ArrayList<byte[]> dataChunks = packetHandler.dividePacket(userDataBytes, MaxPacketSize.SIZE_1024);
       DatagramPacket[] packets = new DatagramPacket[dataChunks.size()];

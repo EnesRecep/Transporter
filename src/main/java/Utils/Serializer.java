@@ -1,9 +1,5 @@
 package Utils;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 
 public class Serializer {
 
@@ -22,6 +18,53 @@ public class Serializer {
                 return o.readObject();
             }
         }
+    }
+
+
+    public static byte[] serialize2(Object obj){
+        byte[] yourBytes = null;
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        ObjectOutput out = null;
+        try {
+            out = new ObjectOutputStream(bos);
+            out.writeObject(obj);
+            out.flush();
+            yourBytes = bos.toByteArray();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                bos.close();
+            } catch (IOException ex) {
+
+            }
+        }
+
+        return yourBytes;
+    }
+
+    public static Object deserialize2(byte[] bytes){
+        Object object = null;
+        ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
+        ObjectInput in = null;
+        try {
+            in = new ObjectInputStream(bis);
+            object = in.readObject();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (in != null) {
+                    in.close();
+                }
+            } catch (IOException ex) {
+                // ignore close exception
+            }
+        }
+
+        return object;
     }
 
 }
