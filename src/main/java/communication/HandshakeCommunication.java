@@ -140,17 +140,13 @@ public class HandshakeCommunication implements Runnable {
             communication.setMessagePortsListen(messagePortsListen);
 
             System.out.println("Waiting for ACK");
-            DatagramPacket receivingPacket = (DatagramPacket) communication.waitForMessage(ackPortsListen);
+            Packet receivingPacket = communication.waitForMessage(ackPortsListen);
             if(receivingPacket == null)
                 continue;
 
-            System.out.println("Received ACK: " + receivedPacket.getData());
-
-
-            receivedPacket = packetHandler.parsePacket(receivingPacket);
+            System.out.println("Received ACK: " + receivedPacket.getSerializedData());
 
             messagePortsSend = receivedPacket.getMessagePorts();
-
             //CALL new method with messagePortSend
             break;
 

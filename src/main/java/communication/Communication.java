@@ -171,7 +171,7 @@ public class Communication {
 
     }
 
-    public Object waitForMessage(int[] ports) {
+    public Packet waitForMessage(int[] ports) {
         DatagramPacket receivedMessage = null;
 
         ServerListenerPool messagePool = new ServerListenerPool();
@@ -181,9 +181,9 @@ public class Communication {
         }
 
         while (true) {
-            Object object = packetHandler.addPacket(receivedMessage);
-            if (object != null)
-                return object;
+            Packet packet = packetHandler.addPacket(receivedMessage);
+            if (packet.getSerializedData() != null)
+                return packet;
 
         }
     }
