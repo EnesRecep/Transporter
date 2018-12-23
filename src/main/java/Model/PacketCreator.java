@@ -18,8 +18,8 @@ public class PacketCreator
 {
   public DatagramPacket[] createPacket(Object data, String destAddress, int destPort, PacketTypeFlag packetType)
   {
-    UserData userData = new UserData(data);
-    data = userData;
+    //UserData userData = new UserData(data);
+    //data = userData;
     try
     {
       byte[] userDataBytes = Serializer.serialize2(data);
@@ -70,6 +70,7 @@ public class PacketCreator
         );
 
         DatagramPacket packet = new DatagramPacket(wholePacketContent, wholePacketContent.length);
+        destAddress = destAddress.replace("/","");
         packet.setAddress(InetAddress.getByName(destAddress));
         packet.setPort(destPort);
 

@@ -24,7 +24,7 @@ public class PacketHandler {
     public byte[] mergePacketData(PriorityQueue<Packet> priorityQueue){
 
         Packet packet = priorityQueue.peek();
-        byte[] packetData = packet.getData();
+        byte[] packetData = packet.getToSerializeData();
         priorityQueue.remove(packet);
 
         while (priorityQueue.size() > 0){
@@ -32,9 +32,9 @@ public class PacketHandler {
             byte[] temp = packetData;
 
             //POSSIBLE ERROR
-            packetData = new byte[temp.length + packet.getData().length];
+            packetData = new byte[temp.length + packet.getToSerializeData().length];
             System.arraycopy(temp,0,packetData,0,temp.length);
-            System.arraycopy(packet.getData(),0,packetData,temp.length,packet.getData().length);
+            System.arraycopy(packet.getToSerializeData(),0,packetData,temp.length,packet.getData().length);
         }
         return packetData;
     }
@@ -57,6 +57,14 @@ public class PacketHandler {
     public Object dataExtraction(DatagramPacket datagramPacket){
 
         Packet packet = new Packet(datagramPacket);
+
+        if(packet.getPacketTypeFlag().equals(PacketTypeFlag.ACK_PACKET)){
+
+            packet.setToSerializeData(Arrays.copyOfRange(datagramPacket.getData(),72, datagramPacket.getData().length));
+        }
+        else{
+            packet.setToSerializeData(Arrays.copyOfRange(datagramPacket.getData(),120,datagramPacket.getData().length));
+        }
         Object dataObject = null;
 
         if(packet.getOrder() == 0 && packet.getLast() == 1){
@@ -71,6 +79,7 @@ public class PacketHandler {
             }
 
             PriorityQueue<Packet> priorityQueue = partitionPriorityQueueHashMap.get(packetPartition);
+
             priorityQueue.add(packet);
 
             if(packet.getLast() == 1){
@@ -79,7 +88,13 @@ public class PacketHandler {
                     partitionPriorityQueueHashMap.remove(packetPartition);
 
 
-                        dataObject = Serializer.deserialize2(mergedPacketData);
+                    try {
+                        dataObject = Serializer.deserialize(mergedPacketData);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (ClassNotFoundException e) {
+                        e.printStackTrace();
+                    }
 
 
                 }
@@ -93,7 +108,13 @@ public class PacketHandler {
         Object dataObject = null;
 
 
-            dataObject = Serializer.deserialize2(packet.getData());
+        try {
+            dataObject = Serializer.deserialize(packet.getData());
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
 
 
         return dataObject;
