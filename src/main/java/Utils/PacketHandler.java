@@ -39,11 +39,10 @@ public class PacketHandler {
         return packetData;
     }
 
-    public Object addPacket(DatagramPacket datagramPacket){
+    public Packet addPacket(DatagramPacket datagramPacket){
 
-        Object object = dataExtraction(datagramPacket);
+        return dataExtraction(datagramPacket);
 
-        return object;
     }
 
     /*
@@ -54,13 +53,14 @@ public class PacketHandler {
     it will be used. Packet will be added to the priorityqueue. When a packet with LAST bit is set comes all packets' data will be extacted and appended.
     The entry will be deleted from the hashmap. Extracted data (byte[]) will be send to extractPacketData.
      */
-    public Object dataExtraction(DatagramPacket datagramPacket){
+    public Packet dataExtraction(DatagramPacket datagramPacket){
 
         Packet packet = new Packet(datagramPacket);
 
         if(packet.getPacketTypeFlag().equals(PacketTypeFlag.ACK_PACKET)){
 
             packet.setToSerializeData(Arrays.copyOfRange(datagramPacket.getData(),72, datagramPacket.getData().length));
+            System.out.println(packet.getToSerializeData().toString());
         }
         else{
             packet.setToSerializeData(Arrays.copyOfRange(datagramPacket.getData(),120,datagramPacket.getData().length));
@@ -70,6 +70,7 @@ public class PacketHandler {
         if(packet.getOrder() == 0 && packet.getLast() == 1){
 
             dataObject = extractPacketData(packet);
+            packet.setSerializedData(dataObject);
         }else{
             int packetPartition = packet.getPartition();
 
@@ -90,6 +91,7 @@ public class PacketHandler {
 
                     try {
                         dataObject = Serializer.deserialize(mergedPacketData);
+                        packet.setSerializedData(dataObject);
                     } catch (IOException e) {
                         e.printStackTrace();
                     } catch (ClassNotFoundException e) {
@@ -101,7 +103,7 @@ public class PacketHandler {
             }
         }
 
-        return dataObject;
+        return packet;
     }
 
     public Object extractPacketData(Packet packet){
@@ -109,7 +111,8 @@ public class PacketHandler {
 
 
         try {
-            dataObject = Serializer.deserialize(packet.getData());
+            dataObject = Serializer.deserialize(packet.getToSerializeData());
+            packet.setSerializedData(dataObject);
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
@@ -117,7 +120,7 @@ public class PacketHandler {
         }
 
 
-        return dataObject;
+        return packet;
     }
 
     /**
