@@ -65,8 +65,12 @@ public class MessageCommunication {
     // The maximum number of trying for waiting ACK
     private final int MAX_TRY = 6;
 
+    Communication communication;
 
-    public MessageCommunication() {
+    public MessageCommunication(){}
+
+    public MessageCommunication(Communication communication) {
+        this.communication = communication;
     }
 
     public int[] getMessagePortsListen() {

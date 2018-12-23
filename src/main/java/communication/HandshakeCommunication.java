@@ -15,7 +15,7 @@ import java.net.SocketException;
 /**
  * Created by Enes Recep on 8.12.2018.
  */
-public class HandshakeCommunication extends Communication implements Runnable {
+public class HandshakeCommunication implements Runnable {
 
 
     private boolean isSending;
@@ -25,6 +25,7 @@ public class HandshakeCommunication extends Communication implements Runnable {
     private SocketHandler socketHandler = new SocketHandler();
     private PacketType packetType;
     private DatagramPacket handShakePacket;
+    private Communication communication;
 
     private boolean execution;
 
@@ -34,6 +35,37 @@ public class HandshakeCommunication extends Communication implements Runnable {
     private int[] messagePortsListen;
     private int[] messagePortsSend;
 
+    public int[] getAckPortsSend() {
+        return ackPortsSend;
+    }
+
+    public void setAckPortsSend(int[] ackPortsSend) {
+        this.ackPortsSend = ackPortsSend;
+    }
+
+    public int[] getAckPortsListen() {
+        return ackPortsListen;
+    }
+
+    public void setAckPortsListen(int[] ackPortsListen) {
+        this.ackPortsListen = ackPortsListen;
+    }
+
+    public int[] getMessagePortsListen() {
+        return messagePortsListen;
+    }
+
+    public void setMessagePortsListen(int[] messagePortsListen) {
+        this.messagePortsListen = messagePortsListen;
+    }
+
+    public int[] getMessagePortsSend() {
+        return messagePortsSend;
+    }
+
+    public void setMessagePortsSend(int[] messagePortsSend) {
+        this.messagePortsSend = messagePortsSend;
+    }
 
     public boolean isState() {
         return state;
@@ -43,45 +75,7 @@ public class HandshakeCommunication extends Communication implements Runnable {
         this.state = state;
     }
 
-    @Override
-    public int[] getAckPortsSend() {
-        return ackPortsSend;
-    }
 
-    @Override
-    public void setAckPortsSend(int[] ackPortsSend) {
-        this.ackPortsSend = ackPortsSend;
-    }
-
-    @Override
-    public int[] getAckPortsListen() {
-        return ackPortsListen;
-    }
-
-    @Override
-    public void setAckPortsListen(int[] ackPortsListen) {
-        this.ackPortsListen = ackPortsListen;
-    }
-
-    @Override
-    public int[] getMessagePortsListen() {
-        return messagePortsListen;
-    }
-
-    @Override
-    public void setMessagePortsListen(int[] messagePortsListen) {
-        this.messagePortsListen = messagePortsListen;
-    }
-
-    @Override
-    public int[] getMessagePortsSend() {
-        return messagePortsSend;
-    }
-
-    @Override
-    public void setMessagePortsSend(int[] messagePortsSend) {
-        this.messagePortsSend = messagePortsSend;
-    }
 
     public boolean isExecution() {
         return execution;
@@ -95,11 +89,21 @@ public class HandshakeCommunication extends Communication implements Runnable {
         packetHandler = new PacketHandler();
     }
 
+    public HandshakeCommunication(Communication communication) throws SocketException {
+        packetHandler = new PacketHandler();
+        this.communication = communication;
+    }
     public void sendHandshakeACK(DatagramPacket receivedHandshakePacket) {
-
+        packetType = new ACKPacket();
         Packet packet = packetHandler.parsePacket(receivedHandshakePacket);
         for (int i = 0; i < Constants.MAX_TEST_TIME/2; i++) {
-            DatagramPacket[] ackPackets = packetType.createPacket(null, receivedHandshakePacket.getAddress().toString(), packet.getAckPorts()[i % 3]);
+            ////////////////////////////////////////////
+            //TEMP DELETE
+            int  a = 5;
+            ////////////////////////////////////////////
+            DatagramPacket[] ackPackets = packetType.createPacket(a, receivedHandshakePacket.getAddress().toString(), packet.getAckPorts()[i % 3]);
+            Packet packetACK = packetHandler.parsePacket(ackPackets[0]);
+            communication.setMessagePortsListen(packetACK.getMessagePorts());
             socketHandler.sendPacket(ackPackets[0]);
         }
 
@@ -120,18 +124,27 @@ public class HandshakeCommunication extends Communication implements Runnable {
             //Creating handshake packet and send to opposite user
             //TODO : instead of null send our public key
             packetType = new HandshakePacket();
-            DatagramPacket[] sendingPackets = packetType.createPacket(null, addr, portHandler.createPortNumberFromDestinationHostname(addr)[i % 3]);
+
+            //////////////////////////////
+            //TEMP DELETE
+
+            String a = "handshake ackackack";
+            ////////////////////////////////////////
+            DatagramPacket[] sendingPackets = packetType.createPacket(a, addr, portHandler.createPortNumberFromDestinationHostname(addr)[i % 3]);
             socketHandler.sendPacket(sendingPackets[0]);
 
             Packet sendingPack = packetHandler.parsePacket(sendingPackets[0]);
             ackPortsListen = sendingPack.getAckPorts();
             System.out.println("ACK ports: "+ ackPortsListen[0]);
             messagePortsListen = sendingPack.getMessagePorts();
+            communication.setMessagePortsListen(messagePortsListen);
 
             System.out.println("Waiting for ACK");
-            DatagramPacket receivingPacket = (DatagramPacket) super.waitForMessage(ackPortsListen);
+            DatagramPacket receivingPacket = (DatagramPacket) communication.waitForMessage(ackPortsListen);
             if(receivingPacket == null)
                 continue;
+
+            System.out.println("Received ACK: " + receivedPacket.getData());
 
 
             receivedPacket = packetHandler.parsePacket(receivingPacket);

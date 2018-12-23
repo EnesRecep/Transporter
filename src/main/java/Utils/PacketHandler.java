@@ -1,6 +1,7 @@
 package Utils;
 
 import Model.Packet;
+import Model.UserData;
 import enums.BitTypeFlag;
 import enums.MaxPacketSize;
 import enums.PacketTypeFlag;
@@ -59,6 +60,7 @@ public class PacketHandler {
         Object dataObject = null;
 
         if(packet.getOrder() == 0 && packet.getLast() == 1){
+
             dataObject = extractPacketData(packet);
         }else{
             int packetPartition = packet.getPartition();
@@ -76,13 +78,10 @@ public class PacketHandler {
                     byte[] mergedPacketData = mergePacketData(priorityQueue);
                     partitionPriorityQueueHashMap.remove(packetPartition);
 
-                    try {
-                        dataObject = Serializer.deserialize(mergedPacketData);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    } catch (ClassNotFoundException e) {
-                        e.printStackTrace();
-                    }
+
+                        dataObject = Serializer.deserialize2(mergedPacketData);
+
+
                 }
             }
         }
@@ -93,13 +92,9 @@ public class PacketHandler {
     public Object extractPacketData(Packet packet){
         Object dataObject = null;
 
-        try {
-            dataObject = Serializer.deserialize(packet.getData());
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+
+            dataObject = Serializer.deserialize2(packet.getData());
+
 
         return dataObject;
     }

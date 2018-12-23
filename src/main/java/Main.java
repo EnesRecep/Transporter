@@ -21,9 +21,9 @@ public class Main {
             e.printStackTrace();
         }
         String str = "We will rock you";
+        int a = 5;
 
-        Object object = communication.communicationWait();
-        System.out.println(object.toString());
+        communication.send(a,"192.168.0.55");
 
 
 

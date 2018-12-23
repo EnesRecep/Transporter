@@ -39,6 +39,8 @@ public class Communication {
     private PacketType packetType;
 
     public Communication() throws SocketException {
+        handshakeCommunication = new HandshakeCommunication(this);
+        messageCommunication = new MessageCommunication(this);
     }
 
     public int[] getMessagePortsListen() {
@@ -115,7 +117,7 @@ public class Communication {
 
     public Object communicationWait() {
         try {
-            handshakeCommunication = new HandshakeCommunication();
+
             handshakeCommunication.setState(true);
             handshakeCommunication.waitHandshakePacket();
 
@@ -124,24 +126,20 @@ public class Communication {
 
         } catch (PacketListenException e) {
             e.printStackTrace();
-        } catch (SocketException e) {
-            e.printStackTrace();
         }
         return waitForMessage(messagePortsListen);
     }
 
     public Object communicationWait(String oppositeAddr) {
         try {
-             handshakeCommunication = new HandshakeCommunication();
-             handshakeCommunication.setState(true);
+
+            handshakeCommunication.setState(true);
             Packet handShakeACKPacket = handshakeCommunication.sendHandshake(oppositeAddr);
             if (handShakeACKPacket.getPacketTypeFlag().equals(PacketTypeFlag.ACK_PACKET))
                 isHandshakeDone = true;
         } catch (PacketListenException e) {
             e.printStackTrace();
         } catch (PacketSendException e) {
-            e.printStackTrace();
-        } catch (SocketException e) {
             e.printStackTrace();
         }
         return waitForMessage(messagePortsListen);
@@ -150,11 +148,7 @@ public class Communication {
     public void send(Object data, String oppositeAddr) {
         Packet handShakeACKPacket = null;
         System.out.println("Sending");
-        try {
-            handshakeCommunication = new HandshakeCommunication();
-        } catch (SocketException e) {
-            e.printStackTrace();
-        }
+
         handshakeCommunication.setState(true);
 
         try {
@@ -183,12 +177,7 @@ public class Communication {
         ServerListenerPool messagePool = new ServerListenerPool();
         receivedMessage = messagePool.threadPoolRunner(ports, Constants.MESSAGE_TIMEOUT);
         if (receivedMessage != null) {
-            try {
-                handshakeCommunication = new HandshakeCommunication();
-                handshakeCommunication.setExecution(false);
-            } catch (SocketException e) {
-                e.printStackTrace();
-            }
+            handshakeCommunication.setExecution(false);
         }
 
         while (true) {
