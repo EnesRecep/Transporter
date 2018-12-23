@@ -19,6 +19,7 @@ public class Packet implements Comparable<Packet>{
     private int[] messagePorts;
     private byte[] data; //was Object changed to byte[]
     private byte[] toSerializeData;
+    private Object serializedData = null;
     public Packet()
     {
     }
@@ -46,6 +47,15 @@ public class Packet implements Comparable<Packet>{
         this.messagePorts = messagePorts;
         this.data = data;
     }
+
+    public Object getSerializedData() {
+        return serializedData;
+    }
+
+    public void setSerializedData(Object serializedData) {
+        this.serializedData = serializedData;
+    }
+
     public byte[] getToSerializeData() {
         return toSerializeData;
     }
