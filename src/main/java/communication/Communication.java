@@ -155,6 +155,8 @@ public class Communication {
     }
 
     public void send(Object data, String oppositeAddr) {
+
+        messageCommunication.setAddress(oppositeAddr);
         Packet handShakeACKPacket = null;
         System.out.println("[Sending packet with data ]" + data);
 
@@ -163,11 +165,21 @@ public class Communication {
         try {
 
             handShakeACKPacket = handshakeCommunication.sendHandshake(oppositeAddr);
-            if (handShakeACKPacket.getPacketTypeFlag().equals(PacketTypeFlag.ACK_PACKET))
+            if (handShakeACKPacket.getPacketTypeFlag().equals(PacketTypeFlag.ACK_PACKET)){
                 isHandshakeDone = true;
+                //terminate threads, close sockets
+            }
 
-            System.out.println("[Starting Waiting for ACK]");
-            messageCommunication.setMessagePortsListen(handShakeACKPacket.getMessagePorts());
+
+            System.out.println("Getting ACK");
+
+            messageCommunication.setState(true);
+            if(ackPortsListen == null){
+                System.out.println("In comm messageportslisten null");
+            }
+            messageCommunication.setMessagePortsListen(messagePortsListen);
+            messageCommunication.setMessagePortsSend(handShakeACKPacket.getMessagePorts());
+
             messageCommunication.startMessageCommunication(data, true);
 
         } catch (PacketSendException e) {
@@ -177,7 +189,6 @@ public class Communication {
         } catch (CommunicationDataException e) {
             e.printStackTrace();
         }
-
     }
 
     public Packet waitForMessage(int[] ports) {
@@ -245,6 +256,4 @@ public class Communication {
         //CommunicationPool.getInstance().removeCommunication(this);
 
     }
-
-
 }

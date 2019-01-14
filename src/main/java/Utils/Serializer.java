@@ -14,8 +14,10 @@ public class Serializer {
         try (ByteArrayOutputStream b = new ByteArrayOutputStream()) {
             try (ObjectOutputStream o = new ObjectOutputStream(b)) {
                 o.writeObject(obj);
+
                 o.flush();
                 o.close();
+
             }
             return b.toByteArray();
         }
@@ -34,7 +36,6 @@ public class Serializer {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         ObjectOutputStream os = new ObjectOutputStream(out);
         os.writeObject(obj);
-        os.writeObject(new EofIndicatorClass());
         return out.toByteArray();
     }
 
@@ -52,7 +53,6 @@ public class Serializer {
         try {
             out = new ObjectOutputStream(bos);
             out.writeObject(obj);
-            out.writeObject(new EofIndicatorClass());
             out.flush();
             yourBytes = bos.toByteArray();
         } catch (IOException e) {

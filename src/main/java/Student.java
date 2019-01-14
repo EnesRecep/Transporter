@@ -1,10 +1,10 @@
+
 import java.io.Serializable;
 
 /**
- * Created by Enes Recep on 7.01.2019.
+ * Created by Tunc on 7.01.2019.
  */
-public class Student implements Serializable {
-
+public class Student implements Serializable{
     private String name;
 
     public Student(String name) {
@@ -26,3 +26,4 @@ public class Student implements Serializable {
                 '}';
     }
 }
+

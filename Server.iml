@@ -11,11 +11,9 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="Maven: commons-lang:commons-lang:2.6" level="project" />
-    <orderEntry type="library" name="Maven: commons-lang:commons-lang:2.6" level="project" />
-    <orderEntry type="library" name="Maven: org.pcap4j:pcap4j-core:2.0.0-alpha.1" level="project" />
-    <orderEntry type="library" name="Maven: net.java.dev.jna:jna:4.2.1" level="project" />
-    <orderEntry type="library" name="Maven: org.pcap4j:pcap4j-packetfactory-static:2.0.0-alpha.1" level="project" />
+    <orderEntry type="library" name="Maven: org.pcap4j:pcap4j-core:2.0.0-alpha.2" level="project" />
+    <orderEntry type="library" name="Maven: net.java.dev.jna:jna:5.1.0" level="project" />
+    <orderEntry type="library" name="Maven: org.pcap4j:pcap4j-packetfactory-static:2.0.0-alpha.2" level="project" />
     <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.25" level="project" />
     <orderEntry type="library" name="Maven: org.slf4j:slf4j-simple:1.7.25" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: junit:junit:4.12" level="project" />

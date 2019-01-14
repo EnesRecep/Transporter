@@ -29,7 +29,9 @@ public class ServerListenerPool {
     public DatagramPacket threadPoolRunner(int[] ports, int timeOut){
         maxAttempt = timeOut * 100;
 
-
+        if(ports == null){
+            System.out.println("ports null");
+        }
         for(int i = 0 ; i < ports.length ; i++) {
             ServerListener listener = null;
             try {
@@ -75,8 +77,10 @@ public class ServerListenerPool {
     public void terminate(){
         for(ServerListener s : listeners){
             //s.closeSocket();
+
             s.setExecution(false);
         }
     }
+
 
 }

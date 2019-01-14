@@ -27,6 +27,7 @@ public class PacketHandler {
     public byte[] mergePacketData(PriorityQueue<Packet> priorityQueue) {
 
 
+
         byte[] both = priorityQueue.peek().getData();
 //        System.out.println("--------------------------------------");
 //        for(int i = 0 ; i < both.length; i++){
@@ -35,6 +36,7 @@ public class PacketHandler {
         priorityQueue.remove(priorityQueue.peek());
         //ByteArrayOutputStream baos = new ByteArrayOutputStream();
         while (priorityQueue.size() > 0){
+
 //            System.out.println("-------------------------------------");
 //            for(int i = 0 ; i < priorityQueue.peek().getData().length ; i++){
 //                System.out.println(priorityQueue.peek().getData()[i]);
@@ -46,20 +48,11 @@ public class PacketHandler {
         }
 
         return both;
+
     }
 
     public Packet addPacket(DatagramPacket datagramPacket) {
 
-
-        /*
-        try {
-            System.out.println("INSIDE ADD PACKET   : " + Serializer.deserialize(new Packet(datagramPacket).getData()));
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        */
         return dataExtraction(datagramPacket);
 
     }
@@ -100,6 +93,7 @@ public class PacketHandler {
             PriorityQueue<Packet> priorityQueue = partitionPriorityQueueHashMap.get(packetPartition);
 
             priorityQueue.add(packet);
+
             //partitionPriorityQueueHashMap.remove(packetPartition);
             partitionPriorityQueueHashMap.put(packetPartition, priorityQueue);
             System.out.println("[DATA EXTRACTION][QUEUE ADD] " + priorityQueue.size());
@@ -108,7 +102,6 @@ public class PacketHandler {
                     byte[] mergedPacketData = mergePacketData(priorityQueue);
                     System.out.println("[AFTER MERGE DATA]");
                     partitionPriorityQueueHashMap.remove(packetPartition);
-
 
                     try {
                         dataObject = Serializer.deserialize(mergedPacketData);
@@ -227,6 +220,7 @@ public class PacketHandler {
         return binary;
     }
 
+
     public Packet parsePacket(DatagramPacket packet) {
         String packetContent = null;
         try {
@@ -245,6 +239,7 @@ public class PacketHandler {
         parsedPacket.setLast(Integer.parseInt(packetContent.substring(21, 22), 2));
         parsedPacket.setPacketTypeFlag(PacketTypeFlag.toPacketTypeFlagEnum(packetContent.substring(22, 24)));
 
+
         if (parsedPacket.getPacketTypeFlag() == PacketTypeFlag.ACK_PACKET) {
             int[] messagePorts = {
                     Integer.parseInt(packetContent.substring(24, 40), 2),
@@ -256,6 +251,7 @@ public class PacketHandler {
 
             parsedPacket.setMessagePorts(messagePorts);
             parsedPacket.setAckPorts(ackPorts);
+
             parsedPacket.setData(Arrays.copyOfRange(packet.getData(), 72, packet.getData().length));
             //parsedPacket.setData(packetContent.substring(72).getBytes());
         } else {
@@ -274,14 +270,13 @@ public class PacketHandler {
 
             parsedPacket.setMessagePorts(messagePorts);
             parsedPacket.setAckPorts(ackPorts);
-            parsedPacket.setData(Arrays.copyOfRange(packet.getData(), 120, packet.getData().length));
+
+            System.out.println("packet content:" + packetContent.substring(120).length());
+
             //parsedPacket.setData(packetContent.substring(120).getBytes());
+            parsedPacket.setData(Arrays.copyOfRange(packet.getData(),120,packet.getData().length));
+            System.out.println("In packet handler:" + packetContent.substring(120).getBytes().length);
 
-
-            String parsedPacketContent = new String(parsedPacket.getData());
-
-            byte[] parsedPacketData = parsedPacket.getData();
-            //parsedPacketData
         }
 
 

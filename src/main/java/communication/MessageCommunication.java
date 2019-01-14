@@ -5,12 +5,14 @@ import Model.MessagePacket;
 import Model.Packet;
 import Model.PacketType;
 import Utils.PacketHandler;
+import Utils.Serializer;
 import Utils.SocketHandler;
 import enums.PacketTypeFlag;
 import exceptions.*;
 import pool.ServerListenerPool;
 
 import javax.xml.crypto.Data;
+import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
@@ -66,7 +68,7 @@ public class MessageCommunication {
     // The maximum number of trying for waiting ACK
     private final int MAX_TRY = 6;
 
-    Communication communication;
+    private Communication communication;
 
     public MessageCommunication() {
     }
@@ -115,6 +117,21 @@ public class MessageCommunication {
         this.packet = packet;
     }
 
+    public boolean isState() {
+        return state;
+    }
+
+    public void setState(boolean state) {
+        this.state = state;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
 
     public void startMessageCommunication(Object outgoingData, boolean isCommunicationStartedByUs) throws CommunicationDataException, PacketSendException {
 
@@ -124,32 +141,58 @@ public class MessageCommunication {
         if (!state)
             throw new PacketSendException("The communication is close!");
 
-
+        try {
+            socketHandler = new SocketHandler();
+        } catch (SocketException e) {
+            e.printStackTrace();
+        }
         packetType = new MessagePacket();
+        System.out.println("Address: " + address);
         DatagramPacket[] packets = packetType.createPacket(outgoingData, address, 5555);
-
 
         for (int i = 0; i < packets.length; i++) {
             for (int j = 0; j < Constants.MAX_TEST_TIME; j++) {
+
                 communication.setAckPortsListen(new Packet(packets[i]).getAckPorts());
                 packets[i].setPort(messagePortsSend[j % 3]);
+
+                System.out.println("PACKET MESSAGE PORTS SEND:");
+                System.out.println(messagePortsSend[j % 3]);
                 socketHandler.sendPacket(packets[i]);
 
 
                 ServerListenerPool ackPool = new ServerListenerPool();
+
+                ackPortsListen = communication.getAckPortsListen();
+
+                if(ackPortsListen == null){
+                    System.out.println("message communcaton ackportslisten null");
+                }
                 DatagramPacket receivedACK = ackPool.threadPoolRunner(ackPortsListen, Constants.MESSAGE_TIMEOUT);
 
                 if (receivedACK == null) {
                     continue;
                 }
+                System.out.println("ACK RECEIVED");
+                try {
+                    System.out.println(Serializer.deserialize(new Packet(receivedACK).getData()).toString());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
+                //System.out.println(new Packet(receivedACK).get);
                 //if (  ) {
+
+                packetHandler = new PacketHandler();
                 messagePortsSend = packetHandler.parsePacket(receivedACK).getMessagePorts();
                 if (packetHandler.getPacketTypeFlag(packets[i]).equals(PacketTypeFlag.FIN_PACKET)) {
-                    try {
-                        new Communication().FINProcedure();
-                    } catch (SocketException e) {
-                        e.printStackTrace();
-                    }
+                     try {
+                         new Communication().FINProcedure();
+                     } catch (SocketException e) {
+                         e.printStackTrace();
+                     }
+
                 }
                 break;
                 //}
