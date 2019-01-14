@@ -94,6 +94,8 @@ public class HandshakeCommunication implements Runnable {
         this.communication = communication;
     }
     public void sendHandshakeACK(DatagramPacket receivedHandshakePacket) {
+
+        System.out.println((new String(receivedHandshakePacket.getData())).substring(120));
         packetType = new ACKPacket();
         Packet packet = packetHandler.parsePacket(receivedHandshakePacket);
         for (int i = 0; i < Constants.MAX_TEST_TIME/2; i++) {
@@ -131,22 +133,36 @@ public class HandshakeCommunication implements Runnable {
             String a = "handshake ackackack";
             ////////////////////////////////////////
             DatagramPacket[] sendingPackets = packetType.createPacket(a, addr, portHandler.createPortNumberFromDestinationHostname(addr)[i % 3]);
+
+            communication.setAckPortsListen(new Packet(sendingPackets[0]).getAckPorts());
+
             socketHandler.sendPacket(sendingPackets[0]);
+            System.out.println("asdasdasdasdasdasdasd");
+            System.out.println((new String(sendingPackets[0].getData())).substring(120));
 
             Packet sendingPack = packetHandler.parsePacket(sendingPackets[0]);
             ackPortsListen = sendingPack.getAckPorts();
             System.out.println("ACK ports: "+ ackPortsListen[0]);
             messagePortsListen = sendingPack.getMessagePorts();
+            if(messagePortsListen == null){
+                System.out.println("messageportslisten null");
+            }
             communication.setMessagePortsListen(messagePortsListen);
 
             System.out.println("Waiting for ACK");
             Packet receivingPacket = communication.waitForMessage(ackPortsListen);
-            if(receivingPacket == null)
+            if(receivingPacket == null){
+
+                System.out.println("NULL");
                 continue;
+            }
 
-            System.out.println("Received ACK: " + receivedPacket.getSerializedData());
+            receivedPacket = receivingPacket;
 
-            messagePortsSend = receivedPacket.getMessagePorts();
+            System.out.println("Received Packet");
+            System.out.println("Received ACK: " + receivingPacket.getSerializedData());
+
+            messagePortsSend = receivingPacket.getMessagePorts();
             //CALL new method with messagePortSend
             break;
 

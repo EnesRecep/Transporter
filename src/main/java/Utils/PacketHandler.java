@@ -6,6 +6,7 @@ import enums.BitTypeFlag;
 import enums.MaxPacketSize;
 import enums.PacketTypeFlag;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.util.*;
@@ -23,23 +24,47 @@ public class PacketHandler {
      */
     public byte[] mergePacketData(PriorityQueue<Packet> priorityQueue){
 
-        Packet packet = priorityQueue.peek();
-        byte[] packetData = packet.getToSerializeData();
-        priorityQueue.remove(packet);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        //Packet packet = priorityQueue.peek();
+//
+//        try {
+//            baos.write(packet.getData());
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+        /*byte[] firstPacketData = packet.getToSerializeData();
+        priorityQueue.remove(packet);*/
 
         while (priorityQueue.size() > 0){
-            packet = priorityQueue.peek();
-            byte[] temp = packetData;
+            Packet packet = priorityQueue.peek();
+            byte[] temp = packet.getData();
 
-            //POSSIBLE ERROR
-            packetData = new byte[temp.length + packet.getToSerializeData().length];
-            System.arraycopy(temp,0,packetData,0,temp.length);
-            System.arraycopy(packet.getToSerializeData(),0,packetData,temp.length,packet.getData().length);
+            try {
+                baos.write(temp);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
         }
-        return packetData;
+
+
+//        for(int i = 0;i < priorityQueue.size();i++){
+//
+//            packet = priorityQueue.peek();
+//            byte[] temp = packet.getData();
+//            temp = Arrays.copyOfRange(temp,15,temp.length);
+//            try {
+//                baos.write(temp);
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
+
+        return baos.toByteArray();
     }
 
     public Packet addPacket(DatagramPacket datagramPacket){
+
 
         return dataExtraction(datagramPacket);
 
@@ -82,12 +107,11 @@ public class PacketHandler {
             PriorityQueue<Packet> priorityQueue = partitionPriorityQueueHashMap.get(packetPartition);
 
             priorityQueue.add(packet);
-
+            partitionPriorityQueueHashMap.put(packetPartition,priorityQueue);
             if(packet.getLast() == 1){
                 if(priorityQueue.size() - 1 == packet.getOrder()){
                     byte[] mergedPacketData = mergePacketData(priorityQueue);
                     partitionPriorityQueueHashMap.remove(packetPartition);
-
 
                     try {
                         dataObject = Serializer.deserialize(mergedPacketData);
@@ -97,8 +121,6 @@ public class PacketHandler {
                     } catch (ClassNotFoundException e) {
                         e.printStackTrace();
                     }
-
-
                 }
             }
         }
@@ -224,7 +246,10 @@ public class PacketHandler {
 
     public Packet parsePacket(DatagramPacket packet)
     {
+
+
         String packetContent = new String(packet.getData());
+
         Packet parsedPacket = new Packet();
 
         parsedPacket.setOrder(Integer.parseInt(packetContent.substring(0, 16), 2));
@@ -235,6 +260,10 @@ public class PacketHandler {
 
         if(parsedPacket.getPacketTypeFlag() == PacketTypeFlag.ACK_PACKET)
         {
+
+            //System.out.println("ack packet parse data");
+            byte[] byteData = Arrays.copyOfRange(packet.getData(),72,packet.getData().length);
+            System.out.println(byteData.length);
             int[] messagePorts = {
                     Integer.parseInt(packetContent.substring(24, 40), 2),
                     Integer.parseInt(packetContent.substring(40, 56), 2),
@@ -245,17 +274,23 @@ public class PacketHandler {
 
             parsedPacket.setMessagePorts(messagePorts);
             parsedPacket.setAckPorts(ackPorts);
-            parsedPacket.setData(packetContent.substring(72).getBytes());
+            //parsedPacket.setData(packetContent.substring(72).getBytes());
+            parsedPacket.setData(Arrays.copyOfRange(packet.getData(),72,packet.getData().length));
         }
         else
         {
+
+//            System.out.println("packet parse data");
+//            byte[] byteData = Arrays.copyOfRange(packet.getData(),120,packet.getData().length);
+//            System.out.println(byteData.length);
+
             int[] ackPorts = {
                     Integer.parseInt(packetContent.substring(24, 40), 2),
                     Integer.parseInt(packetContent.substring(40, 56), 2),
                     Integer.parseInt(packetContent.substring(56, 72), 2)
             };
 
-            System.out.println("Parser ACK Ports"+ackPorts[0]);
+            //System.out.println("Parser ACK Ports"+ackPorts[0]);
             int[] messagePorts = {
                     Integer.parseInt(packetContent.substring(72, 88), 2),
                     Integer.parseInt(packetContent.substring(88, 104), 2),
@@ -264,7 +299,12 @@ public class PacketHandler {
 
             parsedPacket.setMessagePorts(messagePorts);
             parsedPacket.setAckPorts(ackPorts);
-            parsedPacket.setData(packetContent.substring(120).getBytes());
+
+            System.out.println("packet content:" + packetContent.substring(120).length());
+
+            //parsedPacket.setData(packetContent.substring(120).getBytes());
+            parsedPacket.setData(Arrays.copyOfRange(packet.getData(),120,packet.getData().length));
+            System.out.println("In packet handler:" + packetContent.substring(120).getBytes().length);
         }
 
         return parsedPacket;

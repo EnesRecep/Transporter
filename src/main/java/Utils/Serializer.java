@@ -7,6 +7,7 @@ public class Serializer {
         try(ByteArrayOutputStream b = new ByteArrayOutputStream()){
             try(ObjectOutputStream o = new ObjectOutputStream(b)){
                 o.writeObject(obj);
+                //o.writeObject(new EofIndicatorClass());
             }
             return b.toByteArray();
         }
@@ -24,6 +25,7 @@ public class Serializer {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         ObjectOutputStream os = new ObjectOutputStream(out);
         os.writeObject(obj);
+        //os.writeObject(new EofIndicatorClass());
         return out.toByteArray();
     }
     public static Object deserialize2(byte[] data) throws IOException, ClassNotFoundException {
@@ -40,6 +42,7 @@ public class Serializer {
         try {
             out = new ObjectOutputStream(bos);
             out.writeObject(obj);
+            //out.writeObject(new EofIndicatorClass());
             out.flush();
             yourBytes = bos.toByteArray();
         } catch (IOException e) {

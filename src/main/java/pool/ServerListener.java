@@ -1,5 +1,6 @@
 package pool;
 
+import Utils.PortHandler;
 import Utils.SocketHandler;
 
 import java.net.DatagramPacket;
@@ -31,12 +32,20 @@ public class ServerListener implements Runnable {
         return this.packet;
     }
 
+    public void closeScoket(){
+        socketHandler.closeScoket();
+    }
+
     @Override
     public void run() {
         DatagramPacket tempPacket;
         do {
 
+            System.out.println("THREAD");
             System.out.println(port);
+            if(!new PortHandler().isPortAvailable(port)){
+                System.out.println("PORT NOT AVAILABLE");
+            }
             tempPacket = socketHandler.waitForPacket(port);
             if(tempPacket.getData() != null){
                 packet = tempPacket;

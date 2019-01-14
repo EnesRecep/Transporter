@@ -47,6 +47,10 @@ public class SocketHandler {
         }
     }
 
+    public void closeScoket(){
+        socket.close();
+    }
+
     public void openSocket(int port) {
         try {
             socket = new DatagramSocket(port);

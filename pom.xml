@@ -18,22 +18,22 @@
                     <target>1.8</target>
                 </configuration>
             </plugin>
+
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.5</version>
+                <configuration>
+                    <encoding>UTF-8</encoding>
+                    <nonFilteredFileExtensions>
+                        <nonFilteredFileExtension>xls</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>xlsx</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>jrxml</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>jasper</nonFilteredFileExtension>
+                    </nonFilteredFileExtensions>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
-
-    <plugin>
-        <artifactId>maven-resources-plugin</artifactId>
-        <version>2.5</version>
-        <configuration>
-            <encoding>UTF-8</encoding>
-            <nonFilteredFileExtensions>
-                <nonFilteredFileExtension>xls</nonFilteredFileExtension>
-                <nonFilteredFileExtension>xlsx</nonFilteredFileExtension>
-                <nonFilteredFileExtension>jrxml</nonFilteredFileExtension>
-                <nonFilteredFileExtension>jasper</nonFilteredFileExtension>
-            </nonFilteredFileExtensions>
-        </configuration>
-    </plugin>
 
     <dependencies>
 
