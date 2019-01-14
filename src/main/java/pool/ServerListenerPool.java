@@ -1,5 +1,6 @@
 package pool;
 
+import Model.Packet;
 import communication.Constants;
 import enums.PacketTypeFlag;
 
@@ -73,6 +74,7 @@ public class ServerListenerPool {
 
     public void terminate(){
         for(ServerListener s : listeners){
+            //s.closeSocket();
             s.setExecution(false);
         }
     }

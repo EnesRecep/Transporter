@@ -1,20 +1,30 @@
 package Utils;
+
 import java.io.*;
+
 
 public class Serializer {
 
+    public static byte[] serializeData(Object ob) {
+        return ((ob.toString()).getBytes());
+    }
+
+
     public static byte[] serialize(Object obj) throws IOException {
-        try(ByteArrayOutputStream b = new ByteArrayOutputStream()){
-            try(ObjectOutputStream o = new ObjectOutputStream(b)){
+        try (ByteArrayOutputStream b = new ByteArrayOutputStream()) {
+            try (ObjectOutputStream o = new ObjectOutputStream(b)) {
                 o.writeObject(obj);
+                o.flush();
+                o.close();
             }
             return b.toByteArray();
         }
     }
 
     public static Object deserialize(byte[] bytes) throws IOException, ClassNotFoundException {
-        try(ByteArrayInputStream b = new ByteArrayInputStream(bytes)){
-            try(ObjectInputStream o = new ObjectInputStream(b)){
+
+        try (ByteArrayInputStream b = new ByteArrayInputStream(bytes)) {
+            try (ObjectInputStream o = new ObjectInputStream(b)) {
                 return o.readObject();
             }
         }
@@ -24,8 +34,10 @@ public class Serializer {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         ObjectOutputStream os = new ObjectOutputStream(out);
         os.writeObject(obj);
+        os.writeObject(new EofIndicatorClass());
         return out.toByteArray();
     }
+
     public static Object deserialize2(byte[] data) throws IOException, ClassNotFoundException {
         ByteArrayInputStream in = new ByteArrayInputStream(data);
         ObjectInputStream is = new ObjectInputStream(in);
@@ -33,13 +45,14 @@ public class Serializer {
     }
 
 
-    public static byte[] serialize3(Object obj){
+    public static byte[] serialize3(Object obj) {
         byte[] yourBytes = null;
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         ObjectOutput out = null;
         try {
             out = new ObjectOutputStream(bos);
             out.writeObject(obj);
+            out.writeObject(new EofIndicatorClass());
             out.flush();
             yourBytes = bos.toByteArray();
         } catch (IOException e) {
@@ -55,7 +68,7 @@ public class Serializer {
         return yourBytes;
     }
 
-    public static Object deserialize3(byte[] bytes){
+    public static Object deserialize3(byte[] bytes) {
         Object object = null;
         ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
         ObjectInput in = null;

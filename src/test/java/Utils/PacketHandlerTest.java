@@ -34,4 +34,9 @@ public class PacketHandlerTest {
 
         assertEquals((String)object, (String)extractedObject);
     }
+
+    @Test
+    public void dataExtractionTest(){
+
+    }
 }

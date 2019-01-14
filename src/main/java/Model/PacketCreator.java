@@ -22,9 +22,22 @@ public class PacketCreator
     //data = userData;
     try
     {
-      byte[] userDataBytes = Serializer.serialize2(data);
+      byte[] userDataBytes = Serializer.serialize(data);
+
+
+      /*
+        System.out.println("--------------------------");
+        for(int i = 0 ; i < userDataBytes.length ; i++){
+            System.out.println(userDataBytes[i]);
+        }
+        System.out.println("--------------------------");
+
+        */
       PacketHandler packetHandler = new PacketHandler();
       ArrayList<byte[]> dataChunks = packetHandler.dividePacket(userDataBytes, MaxPacketSize.SIZE_1024);
+
+
+
       DatagramPacket[] packets = new DatagramPacket[dataChunks.size()];
       Random random = new Random();
       int partition = random.nextInt(16);
@@ -53,21 +66,24 @@ public class PacketCreator
 
         for(int j = (packetType == PacketTypeFlag.ACK_PACKET ? 1 : 2); j > 0 ; j--)
         {
-            System.out.println("PORTs:");
+            //System.out.println("ACK PACKET ENTERED  : " + j);
+            //System.out.println("PORTs:");
           int port = portHandler.getPort();
-            System.out.println(port);
+            //System.out.println(port);
           header.append(packetHandler.toBinary(port, BitTypeFlag.TO_16_BIT));
           port = portHandler.getPort();
-            System.out.println(port);
+            //System.out.println(port);
           header.append(packetHandler.toBinary(port, BitTypeFlag.TO_16_BIT));
           port = portHandler.getPort();
-            System.out.println(port);
+            //System.out.println(port);
           header.append(packetHandler.toBinary(port, BitTypeFlag.TO_16_BIT));
         }
 
         byte[] wholePacketContent = ArrayUtils.addAll(
                 header.toString().getBytes(), dataChunks.get(i)
         );
+
+
 
         DatagramPacket packet = new DatagramPacket(wholePacketContent, wholePacketContent.length);
         destAddress = destAddress.replace("/","");

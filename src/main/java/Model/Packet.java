@@ -1,8 +1,10 @@
 package Model;
 
 import Utils.PacketHandler;
+import Utils.Serializer;
 import enums.PacketTypeFlag;
 
+import java.io.IOException;
 import java.net.DatagramPacket;
 
 /**
@@ -49,6 +51,15 @@ public class Packet implements Comparable<Packet>{
     }
 
     public Object getSerializedData() {
+        /*try {
+            serializedData = Serializer.deserialize(data);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        */
+        System.out.println("[GET SERIALIZED DATA ]" + serializedData);
         return serializedData;
     }
 

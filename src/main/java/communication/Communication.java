@@ -4,6 +4,7 @@ import Model.Packet;
 import Model.PacketType;
 import Utils.PacketHandler;
 import Utils.PortHandler;
+import Utils.Serializer;
 import Utils.SocketHandler;
 import enums.PacketTypeFlag;
 import exceptions.CommunicationDataException;
@@ -11,6 +12,7 @@ import exceptions.PacketListenException;
 import exceptions.PacketSendException;
 import pool.ServerListenerPool;
 
+import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.SocketException;
 
@@ -112,10 +114,11 @@ public class Communication {
 
     public void keepSendingACK(DatagramPacket receivedhandshake) {
         handshakeCommunication.sendHandshakeACK(receivedhandshake);
-
     }
 
     public Object communicationWait() {
+
+
         try {
 
             handshakeCommunication.setState(true);
@@ -127,7 +130,12 @@ public class Communication {
         } catch (PacketListenException e) {
             e.printStackTrace();
         }
-        return waitForMessage(messagePortsListen);
+
+        Packet packet = waitForMessage(messagePortsListen);
+        //System.out.println("[INCOMING MESSAGE] " + packet.getSerializedData());
+
+
+        return packet.getSerializedData();
     }
 
     public Object communicationWait(String oppositeAddr) {
@@ -142,12 +150,13 @@ public class Communication {
         } catch (PacketSendException e) {
             e.printStackTrace();
         }
-        return waitForMessage(messagePortsListen);
+        Packet packet = waitForMessage(messagePortsListen);
+        return packet.getSerializedData();
     }
 
     public void send(Object data, String oppositeAddr) {
         Packet handShakeACKPacket = null;
-        System.out.println("Sending");
+        System.out.println("[Sending packet with data ]" + data);
 
         handshakeCommunication.setState(true);
 
@@ -157,7 +166,7 @@ public class Communication {
             if (handShakeACKPacket.getPacketTypeFlag().equals(PacketTypeFlag.ACK_PACKET))
                 isHandshakeDone = true;
 
-            System.out.println("Getting ACK");
+            System.out.println("[Starting Waiting for ACK]");
             messageCommunication.setMessagePortsListen(handShakeACKPacket.getMessagePorts());
             messageCommunication.startMessageCommunication(data, true);
 
@@ -172,20 +181,50 @@ public class Communication {
     }
 
     public Packet waitForMessage(int[] ports) {
-        DatagramPacket receivedMessage = null;
 
-        ServerListenerPool messagePool = new ServerListenerPool();
-        receivedMessage = messagePool.threadPoolRunner(ports, Constants.MESSAGE_TIMEOUT);
-        if (receivedMessage != null) {
-            handshakeCommunication.setExecution(false);
+        int i = 0;
+        while(true) {
+            System.out.println(i);
+            System.out.println("[WAITING MESSAGE IN PORTS]" + ports[0] + " " + ports[1] + " " + ports[2]);
+            DatagramPacket receivedMessage = null;
+            ServerListenerPool messagePool = new ServerListenerPool();
+            receivedMessage = messagePool.threadPoolRunner(ports, Constants.MESSAGE_TIMEOUT);
+
+            if (receivedMessage == null) {
+                System.out.println("[RECEIVED MESSAGE IS NULL]");
+            }else{
+                System.out.println("[RECEIVED MESSAGE IS NOT NULL]");
+                //Packet receivedPacket = new Packet(receivedMessage);
+                System.out.println("[INCOME DATA SZIE] " + receivedMessage.getData().length);
+                messageCommunication.sendMessageACK(receivedMessage);
+                ports = getMessagePortsListen();
+                //setMessagePortsListen(ports);
+                //Packet packet = packetHandler.addPacket(receivedMessage);
+                System.out.println("[LAST BIT OF PACKET "+i+" ] = " + new Packet(receivedMessage).getLast());
+                System.out.println("[ORDER BIT OF PACKET "+i+" ] = " + new Packet(receivedMessage).getOrder());
+
+
+                Packet packet = addPacket(receivedMessage);
+
+                if(packet != null){
+                    System.out.println("[PACKET IS ] NOT NULL");
+                    System.out.println("[WAIT FOR MESSAGE] " + packet.getSerializedData());
+                    return packet;
+                }
+                System.out.println("[PACKET IS]  NULL " );
+            }
+            i++;
         }
+    }
 
-        while (true) {
-            Packet packet = packetHandler.addPacket(receivedMessage);
-            if (packet.getSerializedData() != null)
-                return packet;
+    public Packet addPacket(DatagramPacket datagramPacket){
 
-        }
+        Packet packet = packetHandler.addPacket(datagramPacket);
+
+        if(packet != null)
+            return packet;
+        return null;
+
     }
 
     /*
