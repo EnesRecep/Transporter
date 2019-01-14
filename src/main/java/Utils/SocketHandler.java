@@ -1,3 +1,4 @@
+
 package Utils;
 
 import Model.PacketType;
@@ -47,10 +48,6 @@ public class SocketHandler {
         }
     }
 
-    public void closeScoket(){
-        socket.close();
-    }
-
     public void openSocket(int port) {
         try {
             socket = new DatagramSocket(port);
@@ -75,9 +72,9 @@ public class SocketHandler {
 
         try {
             socket = new DatagramSocket(port);
-            byte buffer[] = new byte[256];
+            byte buffer[] = new byte[1144];
             recvPacket = new DatagramPacket(buffer,buffer.length);
-            System.out.println("Waiting for packet:");
+            System.out.println("Waiting for packet in port: " + port);
             socket.receive(recvPacket);
         } catch (SocketTimeoutException ste) {
             ste.getSuppressed();
@@ -88,4 +85,9 @@ public class SocketHandler {
         System.out.println("Connection established");
         return recvPacket;
     }
+
+    public void closeSocket(){
+        socket.close();
+    }
 }
+

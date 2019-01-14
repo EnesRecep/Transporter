@@ -1,6 +1,6 @@
+
 package pool;
 
-import Utils.PortHandler;
 import Utils.SocketHandler;
 
 import java.net.DatagramPacket;
@@ -15,7 +15,7 @@ public class ServerListener implements Runnable {
     private ServerListenerPool pool;
     private int port;
     private DatagramPacket packet;
-    private boolean execution;
+    private boolean execution = true;
     private boolean found;
 
 
@@ -28,31 +28,30 @@ public class ServerListener implements Runnable {
         this.pool = pool;
     }
 
-    public DatagramPacket returnPacket(){
+    public DatagramPacket returnPacket() {
         return this.packet;
-    }
-
-    public void closeScoket(){
-        socketHandler.closeScoket();
     }
 
     @Override
     public void run() {
         DatagramPacket tempPacket;
         do {
-
-            System.out.println("THREAD");
-            System.out.println(port);
-            if(!new PortHandler().isPortAvailable(port)){
-                System.out.println("PORT NOT AVAILABLE");
-            }
+            if (!execution)
+                break;
+            //System.out.println(port);
             tempPacket = socketHandler.waitForPacket(port);
-            if(tempPacket.getData() != null){
+            if (tempPacket.getData() != null) {
                 packet = tempPacket;
                 pool.notifyFound(packet);
             }
-        }while(packet == null  &&  execution );
+
+        } while (packet == null && execution);
 
     }
+
+    public void closeSocket() {
+        socketHandler.closeSocket();
+    }
+
 
 }

@@ -1,5 +1,6 @@
 package communication;
 
+import Model.ACKPacket;
 import Model.MessagePacket;
 import Model.Packet;
 import Model.PacketType;
@@ -69,7 +70,8 @@ public class MessageCommunication {
 
     private Communication communication;
 
-    public MessageCommunication(){}
+    public MessageCommunication() {
+    }
 
     public MessageCommunication(Communication communication) {
         this.communication = communication;
@@ -151,14 +153,6 @@ public class MessageCommunication {
         for (int i = 0; i < packets.length; i++) {
             for (int j = 0; j < Constants.MAX_TEST_TIME; j++) {
 
-//                System.out.println("DATA !!!!!!");
-//                System.out.println("SIZE = " + packets[i].getData().length);
-//                for(int k = 0; k < packets[i].getData().length;k++){
-//                    System.out.println(packets[i].getData()[k]);
-//                }
-//
-//                System.out.println("END DATA");
-
                 communication.setAckPortsListen(new Packet(packets[i]).getAckPorts());
                 packets[i].setPort(messagePortsSend[j % 3]);
 
@@ -189,6 +183,7 @@ public class MessageCommunication {
                 }
                 //System.out.println(new Packet(receivedACK).get);
                 //if (  ) {
+
                 packetHandler = new PacketHandler();
                 messagePortsSend = packetHandler.parsePacket(receivedACK).getMessagePorts();
                 if (packetHandler.getPacketTypeFlag(packets[i]).equals(PacketTypeFlag.FIN_PACKET)) {
@@ -197,6 +192,7 @@ public class MessageCommunication {
                      } catch (SocketException e) {
                          e.printStackTrace();
                      }
+
                 }
                 break;
                 //}
@@ -204,6 +200,33 @@ public class MessageCommunication {
         }
 
 
+    }
+
+    public void sendMessageACK(DatagramPacket receivedHandshakePacket) {
+        try {
+            SocketHandler s = new SocketHandler();
+            packetHandler = new PacketHandler();
+
+            packetType = new ACKPacket();
+            Packet packet = packetHandler.parsePacket(receivedHandshakePacket);
+            for (int i = 0; i < Constants.MAX_TEST_TIME / 2; i++) {
+                ////////////////////////////////////////////
+                //TEMP DELETE
+                System.out.println("[ACK PACKET for MESSAGE is being sent to ] " + packet.getAckPorts()[i % 3]);
+                String a = "This is a message ACK";
+                ////////////////////////////////////////////
+                DatagramPacket[] ackPackets = packetType.createPacket(a, receivedHandshakePacket.getAddress().toString(), packet.getAckPorts()[i % 3]);
+                Packet packetACK = packetHandler.parsePacket(ackPackets[0]);
+                communication.setMessagePortsListen(packetACK.getMessagePorts());
+                //System.out.println("Sending ACK to :" + ackPackets[0].getAddress().getHostAddress());
+                s.sendPacket(ackPackets[0]);
+            }
+        } catch (SocketException e) {
+            e.printStackTrace();
+        }
+
+
+        //Call new Listen method
     }
 
     /*

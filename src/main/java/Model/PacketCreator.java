@@ -16,6 +16,7 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Random;
 
+
 public class PacketCreator {
     public DatagramPacket[] createPacket(Object data, String destAddress, int destPort, PacketTypeFlag packetType) {
         //UserData userData = new UserData(data);
@@ -112,5 +113,6 @@ public class PacketCreator {
         }
 
         return null;
+
     }
 }

@@ -3,12 +3,14 @@ package communication;
 import Model.*;
 import Utils.PacketHandler;
 import Utils.PortHandler;
+import Utils.Serializer;
 import Utils.SocketHandler;
 import exceptions.PacketListenException;
 import exceptions.PacketSendException;
 import pool.ServerListenerPool;
 
 import javax.sound.sampled.Port;
+import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.SocketException;
 
@@ -106,6 +108,7 @@ public class HandshakeCommunication implements Runnable {
             DatagramPacket[] ackPackets = packetType.createPacket(a, receivedHandshakePacket.getAddress().toString(), packet.getAckPorts()[i % 3]);
             Packet packetACK = packetHandler.parsePacket(ackPackets[0]);
             communication.setMessagePortsListen(packetACK.getMessagePorts());
+            System.out.println("[Sending ACK to :]" + ackPackets[0].getAddress().getHostAddress());
             socketHandler.sendPacket(ackPackets[0]);
         }
 
@@ -142,18 +145,17 @@ public class HandshakeCommunication implements Runnable {
 
             Packet sendingPack = packetHandler.parsePacket(sendingPackets[0]);
             ackPortsListen = sendingPack.getAckPorts();
-            System.out.println("ACK ports: "+ ackPortsListen[0]);
+            System.out.println("[ACK listen port : ]"+ ackPortsListen[0]);
             messagePortsListen = sendingPack.getMessagePorts();
             if(messagePortsListen == null){
                 System.out.println("messageportslisten null");
             }
             communication.setMessagePortsListen(messagePortsListen);
 
-            System.out.println("Waiting for ACK");
-            Packet receivingPacket = communication.waitForMessage(ackPortsListen);
-            if(receivingPacket == null){
 
-                System.out.println("NULL");
+            Packet receivingPacket = communication.waitForMessage(ackPortsListen);
+
+            if(receivingPacket == null)
                 continue;
             }
 
@@ -163,12 +165,13 @@ public class HandshakeCommunication implements Runnable {
             System.out.println("Received ACK: " + receivingPacket.getSerializedData());
 
             messagePortsSend = receivingPacket.getMessagePorts();
+
             //CALL new method with messagePortSend
             break;
 
         }
 
-        System.out.println("Returning : " + receivedPacket.toString());
+        System.out.println("[Received ACK]" + receivedPacket.toString());
         return receivedPacket;
 
     }
@@ -180,6 +183,14 @@ public class HandshakeCommunication implements Runnable {
 
         ServerListenerPool ackPool = new ServerListenerPool();
         DatagramPacket receivedhandshake = ackPool.threadPoolRunner(portHandler.getMyPorts(), Constants.MESSAGE_TIMEOUT);
+
+            if (receivedhandshake.getData() == null)
+                System.out.println("Received Handshake is NULL");
+            else {
+                System.out.println("[Received Handshake]");
+                Packet p = new Packet(receivedhandshake);
+                //System.out.println("DATA:  " +  (String)Serializer.deserialize(p.getData()));
+            }
 
         sendHandshakeACK(receivedhandshake);
 
