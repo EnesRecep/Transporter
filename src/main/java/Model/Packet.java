@@ -1,8 +1,10 @@
 package Model;
 
 import Utils.PacketHandler;
+import Utils.Serializer;
 import enums.PacketTypeFlag;
 
+import java.io.IOException;
 import java.net.DatagramPacket;
 
 /**
@@ -18,6 +20,8 @@ public class Packet implements Comparable<Packet>{
     private int[] ackPorts;
     private int[] messagePorts;
     private byte[] data; //was Object changed to byte[]
+    private byte[] toSerializeData;
+    private Object serializedData = null;
     public Packet()
     {
     }
@@ -45,6 +49,32 @@ public class Packet implements Comparable<Packet>{
         this.messagePorts = messagePorts;
         this.data = data;
     }
+
+    public Object getSerializedData() {
+        /*try {
+            serializedData = Serializer.deserialize(data);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        */
+        System.out.println("[GET SERIALIZED DATA ]" + serializedData);
+        return serializedData;
+    }
+
+    public void setSerializedData(Object serializedData) {
+        this.serializedData = serializedData;
+    }
+
+    public byte[] getToSerializeData() {
+        return toSerializeData;
+    }
+
+    public void setToSerializeData(byte[] toSerializeData) {
+        this.toSerializeData = toSerializeData;
+    }
+
     public int getOrder()
     {
         return order;
